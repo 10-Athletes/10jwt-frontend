@@ -16,13 +16,16 @@ class Welcome extends Component {
 
   componentDidMount(){
     let jwt = window.localStorage.getItem('jwt');
-    let result = jwtDecode(jwt)
-    if(result.username){
-      this.setState({username: result.username})
+    if(jwt){
+      let result = jwtDecode(jwt)
+      if(result.username){
+        this.setState({username: result.username})
+      }
     }
     else{
       this.props.history.push('/register')
     }
+
   }
 
   handleLogout () {

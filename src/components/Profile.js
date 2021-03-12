@@ -14,7 +14,8 @@ export default class Profile extends Component {
     error: "",
     changed: 0,
     winner: '0',
-    ratingChange: 0
+    ratingChange: 0,
+    username: ""
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -385,7 +386,7 @@ export default class Profile extends Component {
 
     return(
       <div>
-        <h1 style={{textAlign: "center"}}>{this.state.user.username}'s Profile</h1>
+        <h1 style={{textAlign: "center"}}>{this.state.username}'s Profile</h1>
         <ul style={{paddingLeft: '10%', paddingRight: '30%'}}>
           {athlete}
           {sportsPlayed}
