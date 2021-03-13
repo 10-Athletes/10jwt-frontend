@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { config } from './utility/Constants'
 
+let logo = "/logo2.png";
+let bg = "/bg2.jpg";
 class Signin extends Component {
 
   handleSubmit = event => {
@@ -18,19 +20,47 @@ class Signin extends Component {
   }
 
   render() {
-    return(
+    return (
       <div>
+        <main>
         <form onSubmit={this.handleSubmit}>
-          <label htmlFor='username'>Username</label><br />
-          <input type='username' id='username' name='username' ref={node => {this.inputNode1 = node}}/>
+          <img src={logo} alt="logo" id="logo" width="50" height="50" />
+          <label htmlFor="username">Username</label>
           <br />
-          <label htmlFor='password'>Password</label><br />
-          <input type='password' id='password' name='password' ref={node => {this.inputNode2 = node}}/>
+          <input
+            type="username"
+            id="username"
+            name="username"
+            ref={(node) => {
+              this.inputNode1 = node;
+            }}
+          />
           <br />
-          <input type='submit' value='Sign In'/>
+          <label htmlFor="password">Password</label>
+          <br />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            ref={(node) => {
+              this.inputNode2 = node;
+            }}
+          />
+          <div id="inlineSlot ">
+            <button type="submit" value="Sign In">
+              Sign In
+            </button>
+            <a href="/register">
+              <button type="button" id="blueBtn" value="Sign In">
+                Register
+              </button>
+            </a>
+          </div>
         </form>
+        <img src={bg} alt="bg" className="run" />
+        </main>
       </div>
-    )
+    );
   }
 
 }
