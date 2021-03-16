@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
 
-import { config } from './utility/Constants'
+// import { config } from './utility/Constants'
 
 class Welcome extends Component {
   constructor(props) {

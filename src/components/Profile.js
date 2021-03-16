@@ -9,12 +9,11 @@ export default class Profile extends Component {
     user: {},
     rating: "",
     sport: "",
+    sports: [],
     sportID: 0,
     sportMatches: [],
     error: "",
     changed: 0,
-    winner: '0',
-    ratingChange: 0,
     username: ""
     }
 
@@ -22,18 +21,19 @@ export default class Profile extends Component {
     this.fillSportName = this.fillSportName.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-
+// Configure for allowing viewing other users' profiles
   componentDidMount() {
+    let user = {}
+    let username = ""
+    let sports = []
     let url = config.url.BASE_URL + 'sports'
     let jwt = window.localStorage.getItem('jwt')
     let result = jwtDecode(jwt)
-    let url2 = config.url.BASE_URL + 'users'
+    let url2 = config.url.BASE_URL + 'users/'+result.id
     if (result.username){
-      this.setState({username: result.username})
+      username = result.username
     }
-    let detail = 0
-    let winner = '0'
-    let ratingChange = 0
+    // console.log(this.props)
 
   // SAMPLE FETCH
     // fetch("url,
@@ -43,43 +43,16 @@ export default class Profile extends Component {
     // .then(() => this.props.history.push('/'))
     // .catch(function(error){console.log('There is an error: ', error.message)})
 
-    fetch(url,
-    {method: 'GET'})
-    .then(res => res.json()).then(res => (console.log(res)))
-    // const requestSports = axios.get(url, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true});
-    // const getUser = axios.get(url2, )
-    // axios.all([requestSports, getUser])
-    // .then(axios.spread((...responses) => {
-    //   const sports = responses[0].data.sports
-    //   console.log(responses)
-    //   if (responses[1].data.logged_in) {
-    //     user = responses[1].data.user
-    //   } else {
-    //     // this.props.history.push('/rankings')
-    //   }
-
-      // if(this.props.location.state){
-      //   detail = this.props.location.state.detail
-      //   winner = this.props.location.state.winner
-      //   if(user.events){
-      //     user.sports.forEach((sport) => {
-      //       if(sport.id === detail){
-      //         ratingChange = Math.abs(sport.rating - user.events[user.events.length - 1].p1InitialRating).toFixed(3)
-      //       }
-      //     });
-      //
-      //   }
-      //   }
-
-        // this.setState({
-        //   sports,
-        //   user,
-        //   changed: detail,
-        //   winner,
-        //   ratingChange
-        // });
-    //   })
-    // );
+    Promise.all([fetch(url), fetch(url2)])
+    .then(function(responses) {
+      return Promise.all(responses.map(function(response) {
+        return response.json();
+      }));
+    }).then(function(data){
+      this.setState({sports: data[0].sports, user: data[1].user, username})
+    }.bind(this)).catch(function(error) {
+      console.log(error)
+    })
   }
 
   sortedSportsList(){
@@ -223,39 +196,39 @@ export default class Profile extends Component {
 
  handleSubmit(event){
   event.preventDefault();
- // const { sportMatches, rating, sportID, sport } = this.state
- //  var addThisSport
- //  const addUserToSport =
- //    {
- //      id: this.state.user.id,
- //      rating: parseFloat(rating),
- //      playerName: this.state.user.firstname + " " + this.state.user.lastname,
- //      username: this.state.user.username
- //    }
- //  let error = ""
- //  if(sportMatches.length > 0){
- //    var bold = sportMatches[0].id
- //    addThisSport =
- //    {
- //      id: sportMatches[0].id,
- //      name: sportMatches[0].name,
- //      rating: parseFloat(rating)
- //    }
- //  } else if (sportID !== 0){
- //    bold = sportID
- //    addThisSport =
- //    {
- //      id: sportID,
- //      name: sport,
- //      rating: parseFloat(rating)
- //    }
- //  } else {
- //    error = "Invalid sport name. Verify that you don't already have a rating and haven't misspelled the name of the sport."
- //    this.setState({error})
- //  }
- //  if (error === ""){
- //    let url = config.url.BASE_URL + "users/" + this.state.user.id
- //    let url2 = config.url.BASE_URL + "sports/" + bold
+ const { sportMatches, rating, sportID, sport } = this.state
+  var addThisSport
+  const addUserToSport =
+    {
+      id: this.state.user.id,
+      rating: parseFloat(rating),
+      playerName: this.state.user.firstname + " " + this.state.user.lastname,
+      username: this.state.user.username
+    }
+  let error = ""
+  if(sportMatches.length > 0){
+    var bold = sportMatches[0].id
+    addThisSport =
+    {
+      id: sportMatches[0].id,
+      name: sportMatches[0].name,
+      rating: parseFloat(rating)
+    }
+  } else if (sportID !== 0){
+    bold = sportID
+    addThisSport =
+    {
+      id: sportID,
+      name: sport,
+      rating: parseFloat(rating)
+    }
+  } else {
+    error = "Invalid sport name. Verify that you don't already have a rating and haven't misspelled the name of the sport."
+    this.setState({error})
+  }
+  if (error === ""){
+    let url = config.url.BASE_URL + "users/" + this.state.user.id
+    let url2 = config.url.BASE_URL + "sports/" + bold
  //    let url3 = config.url.BASE_URL + "/logged_in"
  //    axios.all([axios.patch(url, {newSport: addThisSport}, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true} ), axios.patch(url2, {newUserInSport: addUserToSport}, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true})])
  //      .then(axios.spread((...responses) => {
@@ -274,11 +247,12 @@ export default class Profile extends Component {
  //        })})
  //        // this.props.history.push('/profile')
  //      }))
- //    }
+    }
   }
 
 
   render(){
+    console.log(this.state)
     let sportsPlayed = []
     let unofficial = "*"
     let official = ""
