@@ -14,8 +14,6 @@ export default class Profile extends Component {
     sportMatches: [],
     error: "",
     changed: 0,
-    winner: '0',
-    ratingChange: 0,
     username: ""
     }
 
@@ -35,6 +33,7 @@ export default class Profile extends Component {
     if (result.username){
       username = result.username
     }
+    // console.log(this.props)
 
   // SAMPLE FETCH
     // fetch("url,
@@ -207,29 +206,29 @@ export default class Profile extends Component {
       username: this.state.user.username
     }
   let error = ""
- //  if(sportMatches.length > 0){
- //    var bold = sportMatches[0].id
- //    addThisSport =
- //    {
- //      id: sportMatches[0].id,
- //      name: sportMatches[0].name,
- //      rating: parseFloat(rating)
- //    }
- //  } else if (sportID !== 0){
- //    bold = sportID
- //    addThisSport =
- //    {
- //      id: sportID,
- //      name: sport,
- //      rating: parseFloat(rating)
- //    }
- //  } else {
- //    error = "Invalid sport name. Verify that you don't already have a rating and haven't misspelled the name of the sport."
- //    this.setState({error})
- //  }
- //  if (error === ""){
- //    let url = config.url.BASE_URL + "users/" + this.state.user.id
- //    let url2 = config.url.BASE_URL + "sports/" + bold
+  if(sportMatches.length > 0){
+    var bold = sportMatches[0].id
+    addThisSport =
+    {
+      id: sportMatches[0].id,
+      name: sportMatches[0].name,
+      rating: parseFloat(rating)
+    }
+  } else if (sportID !== 0){
+    bold = sportID
+    addThisSport =
+    {
+      id: sportID,
+      name: sport,
+      rating: parseFloat(rating)
+    }
+  } else {
+    error = "Invalid sport name. Verify that you don't already have a rating and haven't misspelled the name of the sport."
+    this.setState({error})
+  }
+  if (error === ""){
+    let url = config.url.BASE_URL + "users/" + this.state.user.id
+    let url2 = config.url.BASE_URL + "sports/" + bold
  //    let url3 = config.url.BASE_URL + "/logged_in"
  //    axios.all([axios.patch(url, {newSport: addThisSport}, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true} ), axios.patch(url2, {newUserInSport: addUserToSport}, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true})])
  //      .then(axios.spread((...responses) => {
@@ -248,7 +247,7 @@ export default class Profile extends Component {
  //        })})
  //        // this.props.history.push('/profile')
  //      }))
- //    }
+    }
   }
 
 
