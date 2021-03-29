@@ -23,9 +23,10 @@ export default class Profile extends Component {
   }
 // Configure for allowing viewing other users' profiles
   componentDidMount() {
-    let user = {}
+    // let user = {}
     let username = ""
-    let sports = []
+    // let sports = []
+
     let url = config.url.BASE_URL + 'sports'
     let jwt = window.localStorage.getItem('jwt')
     let result = jwtDecode(jwt)
@@ -49,7 +50,22 @@ export default class Profile extends Component {
         return response.json();
       }));
     }).then(function(data){
-      this.setState({sports: data[0].sports, user: data[1].user, username})
+      let user = data[1].user
+      let detail = 0
+      let winner = '0'
+      let ratingChange = 0
+      if(this.props.location.state){
+        detail = this.props.location.state.detail
+        winner = this.props.location.state.winner
+        if(user.events){
+          user.sports.forEach((sport) => {
+            if(sport.id === detail){
+              ratingChange = Math.abs(sport.rating - user.events[user.events.length - 1].p1InitialRating).toFixed(3)
+            }
+          });
+        }
+      }
+      this.setState({sports: data[0].sports, user, username, changed: detail, winner, ratingChange})
     }.bind(this)).catch(function(error) {
       console.log(error)
     })
@@ -112,7 +128,7 @@ export default class Profile extends Component {
    let sportMatches = [];
    if(sportName.length >= 3){
      var list = this.state.sports;
-     let user = this.props.user
+     let user = this.state.user
      list.forEach(function(sport,p){
        let addedSport = false;
        let mismatch;
@@ -208,6 +224,9 @@ export default class Profile extends Component {
   let error = ""
   if(sportMatches.length > 0){
     var bold = sportMatches[0].id
+    // addThisSport.append('id', sportMatches[0].id)
+    // addThisSport.append('name', sportMatches[0].name)
+    // addThisSport.append('rating', parseFloat(rating))
     addThisSport =
     {
       id: sportMatches[0].id,
@@ -216,6 +235,9 @@ export default class Profile extends Component {
     }
   } else if (sportID !== 0){
     bold = sportID
+    // addThisSport.append('id', sportID)
+    // addThisSport.append('name', sport)
+    // addThisSport.append('rating', parseFloat(rating))
     addThisSport =
     {
       id: sportID,
@@ -229,6 +251,45 @@ export default class Profile extends Component {
   if (error === ""){
     let url = config.url.BASE_URL + "users/" + this.state.user.id
     let url2 = config.url.BASE_URL + "sports/" + bold
+
+    Promise.all([fetch(
+      url,
+      {method: 'PATCH',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({newSport: addThisSport})}),
+      fetch(
+        url2,
+        {method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({newUserInSport: addUserToSport})})])
+    // fetch(url,
+    //   {method: 'PATCH',
+    //   headers: {'Accept': 'application/json',
+    // 'Content-Type': 'application/json'},
+    //   body: JSON.stringify({newSport: addThisSport})})
+    .then(function(responses) {
+      return Promise.all(responses.map(function(response) {
+        return response.json();
+      }));
+    }).then(function(data){
+      console.log(data)
+    }.bind(this))
+    .catch(function(error) {
+      console.log(error)
+    })
+
+    // fetch("url,
+    // { method: 'POST', body: formData })
+    // .then(res => res.json()).then(res => (console.log(res.jwt),
+    // window.localStorage.setItem('jwt', res.jwt)))
+    // .then(() => this.props.history.push('/'))
+    // .catch(function(error){console.log('There is an error: ', error.message)})
  //    let url3 = config.url.BASE_URL + "/logged_in"
  //    axios.all([axios.patch(url, {newSport: addThisSport}, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true} ), axios.patch(url2, {newUserInSport: addUserToSport}, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true})])
  //      .then(axios.spread((...responses) => {
@@ -378,6 +439,7 @@ export default class Profile extends Component {
             placeholder="Sport Name"
             value={this.state.sport}
             onChange = {this.handleChange}
+            style={{color: "black"}}
             required
           />
           <input
@@ -389,6 +451,7 @@ export default class Profile extends Component {
             placeholder="Rating out of 10"
             value={this.state.rating}
             onChange = {this.handleChange}
+            style={{color: "black"}}
             required
           />
           <div className="sportSearchList" onClick={this.fillSportName}
