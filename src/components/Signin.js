@@ -22,7 +22,7 @@ class Signin extends Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           <label htmlFor='username'>Username</label><br />
-          <input type='username' id='username' name='username' ref={node => {this.inputNode1 = node}}/>
+          <input type='text' id='username' name='username' ref={node => {this.inputNode1 = node}}/>
           <br />
           <label htmlFor='password'>Password</label><br />
           <input type='password' id='password' name='password' ref={node => {this.inputNode2 = node}}/>

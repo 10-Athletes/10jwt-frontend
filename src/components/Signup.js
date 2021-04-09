@@ -36,7 +36,7 @@ class Signup extends Component {
       <div>
         <form onSubmit={this.handleSubmit}>
           <label htmlFor='username'>Username</label><br />
-          <input type='username' id='username' name='username' ref={node => {this.inputNode1 = node}}/>
+          <input type='text' id='username' name='username' ref={node => {this.inputNode1 = node}}/>
           <br />
           <label htmlFor='firstname'>First Name</label><br />
           <input type='text' id='firstname' name='firstname' ref={node => {this.inputNode2 = node}}/>

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import jwtDecode from 'jwt-decode';
 
 import { config } from './utility/Constants'
 
@@ -22,23 +23,44 @@ export default class Rankings extends Component {
   }
 
   componentDidMount() {
+    let jwt = window.localStorage.getItem('jwt');
     let user = {}
-    let url = config.url.BASE_URL + 'sports'
-    let url2 = config.url.BASE_URL + 'logged_in'
-    const requestSports = axios.get(url, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true});
-    const getUser = axios.get(url2, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true})
-    axios.all([requestSports, getUser])
-    .then(axios.spread((...responses) => {
-      const sports = responses[0].data.sports
-      if (responses[1].data.logged_in) {
-        user = responses[1].data.user
+    if(jwt){
+      let result = jwtDecode(jwt)
+      if(result.user){
+        user = result.user
       }
-        this.setState({
-          sports,
-          user
-        });
-      })
-    );
+    }
+    let url = config.url.BASE_URL + 'sports'
+    // let url2 = config.url.BASE_URL + 'logged_in'
+    // SAMPLE FETCH
+      // fetch("url,
+      // { method: 'POST', body: formData })
+      // .then(res => res.json()).then(res => (console.log(res.jwt),
+      // window.localStorage.setItem('jwt', res.jwt)))
+      // .then(() => this.props.history.push('/'))
+      // .catch(function(error){console.log('There is an error: ', error.message)})
+    fetch(url)
+    .then(response => response.json())
+    .then(function(data){
+      this.setState({sports: data.sports, user})
+    }.bind(this)).catch(function(error) {
+      console.log(error)
+    })
+    // const requestSports = axios.get(url, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true});
+    // const getUser = axios.get(url2, {headers: {'Access-Control-Allow-Origin': '*'}}, {withCredentials: true})
+    // axios.all([requestSports, getUser])
+    // .then(axios.spread((...responses) => {
+    //   const sports = responses[0].data.sports
+    //   if (responses[1].data.logged_in) {
+    //     user = responses[1].data.user
+    //   }
+    //     this.setState({
+    //       sports,
+    //       user
+    //     });
+    //   })
+    // );
   }
 
   handleChange(event) {
