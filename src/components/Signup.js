@@ -97,7 +97,7 @@ class Signup extends Component {
               />
             </label>
             <div id="inlineSlot blueBtn">
-              <label for="register">
+              <label htmlFor="register">
                 {" "}
                 <button id="signin" type="submit">
                   Register
