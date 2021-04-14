@@ -40,9 +40,9 @@ class Welcome extends Component {
   render(){
     return(
       <div>
-      <button onClick={this.handleLogout}>Logout</button><br />
-      <button onClick={this.handleProfileClick}>Profile</button><br />
-        <h1>hello {this.state.username}</h1>
+        <button onClick={this.handleLogout}>Logout</button><br />
+        <button onClick={this.handleProfileClick}>Profile</button><br />
+          <h1>hello {this.state.username}</h1>
       </div>
     )
   }
