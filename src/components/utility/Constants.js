@@ -10,3 +10,7 @@ const dev = {
  }
 };
 export const config = process.env.NODE_ENV === 'development' ? dev : prod;
+
+export default function cap(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}

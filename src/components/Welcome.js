@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
-
+import Profile from "./templates/ProfileBtn";
+import Logout from "./templates/LogoutBtn";
 // import { config } from './utility/Constants'
+import {Container, Row, Col} from "reactstrap";
 
 class Welcome extends Component {
   constructor(props) {
@@ -38,13 +40,28 @@ class Welcome extends Component {
   }
 
   render(){
-    return(
+    return (
       <div>
-        <button onClick={this.handleLogout}>Logout</button><br />
-        <button onClick={this.handleProfileClick}>Profile</button><br />
-          <h1>hello {this.state.username}</h1>
+        <Container style={{background: '#eee', height: '500px', marginTop:'5%', display: 'flex', alignItems: 'center', justifyContent:'center'}}>
+          <Row>
+            <Col xs="6">
+              <Container>
+                <h3>
+                  Welcome back, {this.state.username},<br />
+                  <small>use the links above to navigate</small>
+                </h3>
+              </Container>
+            </Col>
+            <Col xs="6">
+              <Container>
+                <Logout onClick={this.handleLogout}>Logout</Logout> &nbsp;
+                <Profile onClick={this.handleProfileClick}>Profile</Profile>
+              </Container>
+            </Col>
+          </Row>
+        </Container>
       </div>
-    )
+    );
   }
 
 }

@@ -1,4 +1,4 @@
-#bg, .run {
+/*#bg, .run {
     position:fixed;
     z-index:-5;
     top:0;
@@ -39,8 +39,7 @@ input {
     margin-bottom:15px
 }
 form {
-    margin-top:25vh;
-    margin-left:40vw;
+    
     border-radius:5px;
     box-shadow:#555a 0 3px 24px;
     border:4px solid #fff;
@@ -50,7 +49,7 @@ form {
     flex-direction:column;
     align-items:flex-start;
     justify-content:flex-start;
-    position:fixed;
+    position:relative;
     z-index:99;
 }
 
@@ -77,4 +76,4 @@ button:focus {
 button#blueBtn {
     background-color:#5af;
     color:#fff;
-}
+}*/
