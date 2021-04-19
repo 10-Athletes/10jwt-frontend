@@ -14,6 +14,7 @@ import {
   CardImg,
   CardText,
   CardBody,
+  CardLink,
   CardTitle,
   CardSubtitle,
   Navbar,
@@ -52,6 +53,7 @@ export default class Profile extends Component {
     changed: 0,
     username: ""
     }
+    
 
     this.handleChange = this.handleChange.bind(this);
     this.fillSportName = this.fillSportName.bind(this);
@@ -62,6 +64,7 @@ export default class Profile extends Component {
     // let user = {}
     let username = ""
     // let sports = []
+    
     function capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     }
@@ -364,6 +367,14 @@ handleSubmit(event){
     let ratingChange = ""
     let anyUnofficial = false
     let anyUnplayed = false
+    
+    //let photos = [
+    //  'sibVwORYqs0',
+    //  'd2MSDujJl2g',
+    //  'i4OHxtxiMtk'
+    //];
+    //let getPhoto = photos[Math.floor(Math.random() * photos.length)];
+    //let userPhoto = `https://source.unsplash.com/${getPhoto}/150x150`;
 
     if(this.state.user.sports && this.state.user.sports.length > 0){
 
@@ -462,25 +473,35 @@ handleSubmit(event){
 
     return (
       <div>
-        <Container>
+        <Container className="my-5 mx-auto">
           <Row>
             <Col>
-              <h1 style={{ textAlign: "center" }}>
-                {this.state.username}'s Profile
-              </h1>
-              <ul>
-                {athlete}
-                {sportsPlayed}
-              </ul>
-            </Col>
-            <Col>
-              <ul>
-                <h3>
-                  Pick a sport that you want to play and set your initial rating
-                  out of 10.
-                </h3>
-                <br />
-                <Form onSubmit={this.handleSubmit}>
+              <Card>
+                <CardImg top height="150px" width="150px" style={{width: '150px', height: '150px', margin: '15px auto'}} src="../logo2.png" alt="Card image cap" />
+        <CardBody>
+          <CardTitle tag="h5">{this.state.username}'s Profile</CardTitle>
+          <CardSubtitle tag="h6" className="mb-2 text-muted">{athlete || 'Type of Athlete'}</CardSubtitle>
+          <CardSubtitle tag="h6" className="mb-2 text-muted">{sportsPlayed || 'Sports played'}</CardSubtitle>
+        </CardBody>
+        <CardBody>
+                </CardBody>
+              </Card>
+                </Col>
+              <Col>
+              <Card style={{ padding: "30px", backgroundColor:'#444' }}>
+                  <CardTitle className="text-white">
+                  * : Unofficial rating. You must play at least five unique
+                  opponents in a sport before your rating is official.
+                    </CardTitle>
+                    <br />
+                    <CardTitle className="text-white">
+                  ** : For your athlete rating to be official you must have at
+                  least one official sport.
+                  </CardTitle>
+                  <br />
+                  <legend className="text-white"> Pick a sport that you want to play and set your initial rating
+                  out of 10</legend>
+                  <Form onSubmit={this.handleSubmit}>
                   <Input
                     type="name"
                     name="sport"
@@ -517,17 +538,23 @@ handleSubmit(event){
                     {this.state.error}
                   </h3>
                 </Form>
-                <Card style={{ padding: "30px" }}>
-                  <CardTitle>
-                    * : Unofficial rating. You must play at least five unique
-                    opponents in a sport before your rating is official.
-                    <br />
-                    ** : For your athlete rating to be official you must have at
-                    least one official sport.
-                  </CardTitle>
+                  
                 </Card>
-              </ul>
+
             </Col>
+          </Row>
+          <Row>
+            <Col>
+             <Container>
+                <Card style={{padding: '15px'}}>
+                  <CardTitle>
+                    data
+                    </CardTitle>
+                  </Card>
+
+             </Container>
+            </Col>
+            <Col></Col>
           </Row>
         </Container>
       </div>

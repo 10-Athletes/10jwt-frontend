@@ -307,12 +307,13 @@ export default class Rankings extends Component {
       <Container
         style={{
           background: "#eee",
-          marginTop: "5%",
+          marginTop: "15px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
+        <Row>
               <Col xs="6">
                 <Form>
                   <ListGroup>
@@ -372,7 +373,12 @@ export default class Rankings extends Component {
                 </h1>
                 <ol> {participants} </ol>
               </Col>
-            
+        </Row>
+        <Row>
+          <Col>
+            charts
+          </Col>
+        </Row>
       </Container>
     );
   }
