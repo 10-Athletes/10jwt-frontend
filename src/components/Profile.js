@@ -1,6 +1,44 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
+import { Chart } from "react-charts";
 import { config } from './utility/Constants'
+
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  ListGroup,
+  ListGroupItem,
+  Collapse,
+  Card,
+  CardImg,
+  CardText,
+  CardBody,
+  CardLink,
+  CardTitle,
+  CardSubtitle,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  NavbarText,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  FormText,
+} from "reactstrap";
+let errorObj = {
+  errorMsg:
+    "Invalid sport name. Verify that you don't already have a rating and haven't misspelled the name of the sport.",
+};
 
 export default class Profile extends Component {
   constructor(props) {
@@ -16,6 +54,7 @@ export default class Profile extends Component {
     changed: 0,
     username: ""
     }
+    
 
     this.handleChange = this.handleChange.bind(this);
     this.fillSportName = this.fillSportName.bind(this);
@@ -26,13 +65,16 @@ export default class Profile extends Component {
     // let user = {}
     let username = ""
     // let sports = []
-
+    
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
     let url = config.url.BASE_URL + 'sports'
     let jwt = window.localStorage.getItem('jwt')
     let result = jwtDecode(jwt)
     let url2 = config.url.BASE_URL + 'users/'+result.id
     if (result.username){
-      username = result.username
+      username = capitalizeFirstLetter(result.username);
     }
     // console.log(this.props)
 
@@ -210,9 +252,11 @@ export default class Profile extends Component {
  })
 }
 
- handleSubmit(event){
+handleSubmit(event){
   event.preventDefault();
- const { sportMatches, rating, sportID, sport } = this.state
+  const { sportMatches, rating, sportID, sport } = this.state
+  //restructing example
+  
   var addThisSport
   const addUserToSport =
     {
@@ -245,7 +289,7 @@ export default class Profile extends Component {
       rating: parseFloat(rating)
     }
   } else {
-    error = "Invalid sport name. Verify that you don't already have a rating and haven't misspelled the name of the sport."
+    error = errorObj.errorMsg
     this.setState({error})
   }
   if (error === ""){
@@ -324,6 +368,14 @@ export default class Profile extends Component {
     let ratingChange = ""
     let anyUnofficial = false
     let anyUnplayed = false
+    
+    //let photos = [
+    //  'sibVwORYqs0',
+    //  'd2MSDujJl2g',
+    //  'i4OHxtxiMtk'
+    //];
+    //let getPhoto = photos[Math.floor(Math.random() * photos.length)];
+    //let userPhoto = `https://source.unsplash.com/${getPhoto}/150x150`;
 
     if(this.state.user.sports && this.state.user.sports.length > 0){
 
@@ -336,12 +388,13 @@ export default class Profile extends Component {
         if(sport){
           if(sport.id === this.state.changed){
             weight = 'bold'
-            fontSize = 'larger'
+            fontSize = '14px'
             if(this.state.winner === '1'){
               color = 'green'
               ratingChange = `+(${this.state.ratingChange})`
             } else if (this.state.winner === '2') {
               color = 'red'
+              fontSize = '14px'
               ratingChange = `(-${this.state.ratingChange})`
             } else {
               color = 'blue'
@@ -419,53 +472,94 @@ export default class Profile extends Component {
     });
 
 
-    return(
+    return (
       <div>
-        <h1 style={{textAlign: "center"}}>{this.state.username}'s Profile</h1>
-        <ul style={{paddingLeft: '10%', paddingRight: '30%'}}>
-          {athlete}
-          {sportsPlayed}
-        </ul>
-        <br/>
-        <br/>
+        <Container fluid style={{marginTop:'1rem', width:'100%'}}>
+          <Row>
+            <Col>
+              <Card>
+                <CardImg top height="150px" width="150px" style={{width: '150px', height: '150px', margin: '15px auto'}} src="../logo2.png" alt="Card image cap" />
+        <CardBody>
+          <CardTitle tag="h5">{this.state.username}'s Profile</CardTitle>
+          <CardSubtitle tag="h6" className="mb-2 text-muted">{athlete || 'Type of Athlete'}</CardSubtitle>
+          <CardSubtitle tag="h6" className="mb-2 text-muted">{sportsPlayed || 'Sports played'}</CardSubtitle>
+        </CardBody>
+        <CardBody>
+                </CardBody>
+              </Card>
+                </Col>
+              <Col>
+              <Card style={{ padding: "30px", backgroundColor:'#eee' }}>
+                  <CardTitle className="text-dark">
+                  * : Unofficial rating. You must play at least five unique
+                  opponents in a sport before your rating is official.
+                    </CardTitle>
+                    <br />
+                    <CardTitle className="text-dark">
+                  ** : For your athlete rating to be official you must have at
+                  least one official sport.
+                  </CardTitle>
+                  
+                  <legend className="text-dark"> Pick a sport that you want to play and set your initial rating
+                  out of 10</legend>
+                  <Form onSubmit={this.handleSubmit}>
+                  <Input
+                    type="name"
+                    name="sport"
+                    placeholder="Sport Name"
+                    value={this.state.sport}
+                    onChange={this.handleChange}
+                    style={{ color: "black" }}
+                    required
+                  />
+                  <Input
+                    type="number"
+                    step=".5"
+                    name="rating"
+                    min="1.0"
+                    max="10.00000000000"
+                    placeholder="Rating out of 10"
+                    value={this.state.rating}
+                    onChange={this.handleChange}
+                    style={{ color: "black", marginTop: "15px" }}
+                    required
+                  />
+                  <ListGroup
+                    className="sportSearchList"
+                    onClick={this.fillSportName}
+                  >
+                    {/*each (sports in sportList){" "}
+                    {<ListGroupItem>{sportList}</ListGroupItem>}*/}
+                    {sportList}
+                  </ListGroup>
+                  <Button style={{ marginTop: "30px" }} type="submit">
+                    Add Rating
+                  </Button>
+                  <h3 style={{ color: "red", fontSize: "14px" }}>
+                    {this.state.error}
+                  </h3>
+                </Form>
+                  
+                </Card>
+                    
+            </Col>
+            
+          </Row>
+          <Row>
+          <Col>
+                    <br />
+              <Card style={{ backgroundColor:'#444', marginRight:'-15px', textAlign:'center', marginLeft:'-15px', minWidth: '90%' }}>
+                    <br />
+                <CardTitle className="text-white" style={{padding: '15px'}}>
+                 Chart data
+                    </CardTitle>
+                    <br />
+                    
+              </Card>
+            </Col>
 
-        <ul>
-        <h3>Pick a sport that you want to play and set your initial rating out of 10.</h3>
-        <br />
-        <form onSubmit={this.handleSubmit}>
-          <input
-            type="name"
-            name="sport"
-            placeholder="Sport Name"
-            value={this.state.sport}
-            onChange = {this.handleChange}
-            style={{color: "black"}}
-            required
-          />
-          <input
-            type="number"
-            step=".5"
-            name="rating"
-            min="1.0"
-            max="10.00000000000"
-            placeholder="Rating out of 10"
-            value={this.state.rating}
-            onChange = {this.handleChange}
-            style={{color: "black"}}
-            required
-          />
-          <div className="sportSearchList" onClick={this.fillSportName}
-          >{sportList}</div>
-          <br/>
-          <br />
-          <button type="submit">Add Rating</button>
-          <br /> <br />
-          <h3 style={{color: "red"}}>{this.state.error}</h3>
-        </form>
-        <br/>
-        <h4>* : Unofficial rating. You must play at least five unique opponents in a sport before your rating is official.<br />
-        ** : For your athlete rating to be official you must have at least one official sport.</h4>
-        </ul>
+          </Row>
+        </Container>
       </div>
-    )}
+    );}
 }

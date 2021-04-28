@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
-
+import Profile from "./templates/ProfileBtn";
+import Logout from "./templates/LogoutBtn";
 // import { config } from './utility/Constants'
+import {Container, Row, Col, NavLink} from "reactstrap";
 
-class Welcome extends Component {
+export default class Welcome extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -38,15 +40,30 @@ class Welcome extends Component {
   }
 
   render(){
-    return(
+    return (
       <div>
-      <button onClick={this.handleLogout}>Logout</button><br />
-      <button onClick={this.handleProfileClick}>Profile</button><br />
-        <h1>hello {this.state.username}</h1>
+        <Container style={{marginTop: '1rem',width: '100%'}} fluid>
+          <Row>
+            <Col>
+              <Container style={{border: '1px solid #eee', padding: '2em'}}>
+                <h3>
+                  Welcome back, {this.state.username},<br />
+                  <small>use the links above to navigate</small>
+                </h3>
+              </Container>
+            </Col>
+            <Col>
+              <Container style={{border: '1px solid #eee', padding: '2em'}}>
+                  <NavLink className="btn-primary" href="/ranking/">View Rankings</NavLink>
+                  <NavLink className="btn-info" href="/profile/">View Profile</NavLink>
+                  <NavLink className="btn-muted" href="/logout/">Logout</NavLink>
+                
+              </Container>
+            </Col>
+          </Row>
+        </Container>
       </div>
-    )
+    );
   }
 
 }
-
-export default Welcome;

@@ -1,9 +1,40 @@
 import React, { Component } from 'react';
-import { config } from './utility/Constants'
-import "./Signup.module.css"
-
-let logo = "/logo2.png"
-let bg = "/bg.jpg"
+import {config} from './utility/Constants';
+import Signin from "./Signin";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  ButtonGroup,
+  ListGroup,
+  ListGroupItem,
+  Collapse,
+  Card,
+  CardImg,
+  CardText,
+  CardBody,
+  CardLink,
+  CardTitle,
+  CardSubtitle,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+  NavbarText,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  FormText,
+} from "reactstrap";
+import {Link} from 'react-router-dom';
 
 
 class Signup extends Component {
@@ -38,87 +69,89 @@ class Signup extends Component {
   render() {
     return (
       <div>
-        <main>
-          <form onSubmit={this.handleSubmit}>
-            <img src={logo} alt="logo" id="logo" width="50" height="50" />
-            <label htmlFor="username">
-              Username
-              <input
-                type="username"
-                id="username"
-                name="username"
-                ref={(node) => {
-                  this.inputNode1 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="firstname">
-              First Name{" "}
-              <input
-                type="text"
-                id="firstname"
-                name="firstname"
-                ref={(node) => {
-                  this.inputNode2 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="firstname">
-              Last Name
-              <input
-                type="text"
-                id="lastname"
-                name="lastname"
-                ref={(node) => {
-                  this.inputNode3 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="email">
-              Email{" "}
-              <input
-                type="email"
-                id="email"
-                name="email"
-                ref={(node) => {
-                  this.inputNode4 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="password">
-              Password
-              <input
-                type="password"
-                id="password"
-                name="password"
-                ref={(node) => {
-                  this.inputNode5 = node;
-                }}
-              />
-            </label>
-            <div id="inlineSlot blueBtn">
-              <label for="register">
-                {" "}
-                <button id="signin" type="submit">
-                  Register
-                </button>
-              </label>
-              <a href="/signin">
-                <label id="signinLabel" for="signin">
-                  {" "}
-                  <button id="register" type="button">
-                    Sign In
-                  </button>
-                </label>{" "}
-              </a>
-            </div>
-          </form>{" "}
-          <img src={bg} alt="bg" className="run" />
-        </main>
+        <Container fluid>
+          <Row>
+            <Col md={4} style={{margin: '0 auto', textAlign: 'center'}}>
+              <Form onSubmit={this.handleSubmit}>
+                <FormGroup style={{display:'inline-block'}}>
+                  <img src="" alt="logo" id="logo" width="50" height="50" />
+                  <FormText><h1>Register</h1></FormText>
+                </FormGroup>
+                <FormGroup>
+                  <Input
+                  type="username"
+                  placeholder="Username"
+                  id="username"
+                  name="username"
+                  ref={(node) => {
+                    this.inputNode1 = node;
+                  }}
+                  >
+                  </Input>
+                  <br/>
+                  <Input
+                    type="name"
+                    placeholder="First Name"
+                  id="firstname"
+                  name="firstname"
+                  ref={(node) => {
+                    this.inputNode2 = node;
+                  }}
+                  >
+                  </Input>
+                  <br/>
+                  <Input
+                    type="text"
+                    placeholder="Last Name"
+                  id="lastname"
+                  name="lastname"
+                  ref={(node) => {
+                    this.inputNode3 = node;
+                  }}
+                  >
+                  </Input>
+                  <br/>
+                  <Input
+                    type="email"
+                    placeholder="Email Address"
+                  id="email"
+                  name="email"
+                  ref={(node) => {
+                    this.inputNode4 = node;
+                  }}
+                  >
+                  </Input>
+                  <br/>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                  id="password"
+                  name="password"
+                  ref={(node) => {
+                    this.inputNode5 = node;
+                  }}
+                  >
+                  </Input>
+                </FormGroup>
+                <ButtonGroup>
+                  <Link to="/SignIn" >
+                    <Button type="button" style={{borderRadiusTopRight:'0', borderRadiusBottomRight: '0', width: '150px'}} color="secondary">Sign In</Button>
+                  </Link>
+                    <Button type="button" color="primary" style={{borderRadiusTopRight:'0', borderRadiusBottomRight: '0', width: '150px'}}>Sign Up</Button>
+                </ButtonGroup>
+
+              </Form>
+            </Col>
+            
+
+
+          </Row>
+
+        </Container>
+        
       </div>
     );
   }
   
 }
-
 export default Signup;

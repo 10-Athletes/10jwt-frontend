@@ -1,0 +1,15 @@
+{
+    "prettier.requireConfig": true,
+    "json.format.enable": false,
+    "html.format.enable": false,
+    "prettier.embeddedLanguageFormatting": "off",
+    "javascript.format.insertSpaceAfterCommaDelimiter": false,
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "typescript.format.insertSpaceAfterCommaDelimiter": false,
+    "editor.formatOnType": true,
+    "workbench.editor.labelFormat": "medium",
+    "editor.formatOnSave": true
+}
