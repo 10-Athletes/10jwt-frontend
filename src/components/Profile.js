@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
+import { Chart } from "react-charts";
 import { config } from './utility/Constants'
-import NB from "./NB"
+
 import {
   Container,
   Row,
@@ -473,7 +474,7 @@ handleSubmit(event){
 
     return (
       <div>
-        <Container className="my-5 mx-auto">
+        <Container fluid style={{marginTop:'1rem', width:'100%'}}>
           <Row>
             <Col>
               <Card>
@@ -488,18 +489,18 @@ handleSubmit(event){
               </Card>
                 </Col>
               <Col>
-              <Card style={{ padding: "30px", backgroundColor:'#444' }}>
-                  <CardTitle className="text-white">
+              <Card style={{ padding: "30px", backgroundColor:'#eee' }}>
+                  <CardTitle className="text-dark">
                   * : Unofficial rating. You must play at least five unique
                   opponents in a sport before your rating is official.
                     </CardTitle>
                     <br />
-                    <CardTitle className="text-white">
+                    <CardTitle className="text-dark">
                   ** : For your athlete rating to be official you must have at
                   least one official sport.
                   </CardTitle>
-                  <br />
-                  <legend className="text-white"> Pick a sport that you want to play and set your initial rating
+                  
+                  <legend className="text-dark"> Pick a sport that you want to play and set your initial rating
                   out of 10</legend>
                   <Form onSubmit={this.handleSubmit}>
                   <Input
@@ -540,21 +541,23 @@ handleSubmit(event){
                 </Form>
                   
                 </Card>
-
+                    
             </Col>
+            
           </Row>
           <Row>
-            <Col>
-             <Container>
-                <Card style={{padding: '15px'}}>
-                  <CardTitle>
-                    data
+          <Col>
+                    <br />
+              <Card style={{ backgroundColor:'#444', marginRight:'-15px', textAlign:'center', marginLeft:'-15px', minWidth: '90%' }}>
+                    <br />
+                <CardTitle className="text-white" style={{padding: '15px'}}>
+                 Chart data
                     </CardTitle>
-                  </Card>
-
-             </Container>
+                    <br />
+                    
+              </Card>
             </Col>
-            <Col></Col>
+
           </Row>
         </Container>
       </div>

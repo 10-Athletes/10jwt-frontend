@@ -26,6 +26,9 @@ import {
   Label,
   Input,
   FormText,
+  Card,
+  CardTitle,
+  CardBody,
 } from "reactstrap";
 export default class Rankings extends Component {
   constructor(props) {
@@ -88,6 +91,7 @@ export default class Rankings extends Component {
     //     });
     //   })
     // );
+    
   }
 
   handleChange(event) {
@@ -222,6 +226,7 @@ export default class Rankings extends Component {
   }
 
   render() {
+    
     let participants = [];
     let nextSport = "";
     let sportName = "";
@@ -230,6 +235,7 @@ export default class Rankings extends Component {
     if (this.state.sportMatches.length > 0) {
       nextSport = this.state.sportMatches[0].name;
     }
+    
     this.state.sports.forEach((sport, i) => {
       if (sport.id === this.state.sportID) {
         sportName = sport.name;
@@ -302,22 +308,20 @@ export default class Rankings extends Component {
         </div>
       );
     });
-
+    const isEnabled = sportName.length > 0;
+    
+    
     return (
-      <Container
-        style={{
-          background: "#eee",
-          marginTop: "15px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <Container fluid style={{marginTop:'1rem', width:'100%'}}>
+                    <br/>
         <Row>
-              <Col xs="6">
+          <Col>
+          <Card style={{padding:'25px'}}>
+              <CardTitle>
                 <Form>
                   <ListGroup>
                     <h3>Sport:</h3>
+                    <br/>
                     <Input
                       type="name"
                       name="sport"
@@ -325,60 +329,68 @@ export default class Rankings extends Component {
                       value={this.state.sport}
                       onChange={this.handleChange}
                       required
-                    />
+                      />
                     <ul
                       className="sportSearchList"
                       onClick={this.fillSportName}
-                    >
+                      >
                       {sportList}
-                    </ul>
+                    </ul><br/>
+                    <FormGroup check>
                     <Label
-                      htmlFor="#NotIncluded"
-                      className="btn btn-large btn-primary"
-                    >
-                      <b>Official</b>
+                      check
+                      >
                       <Input
                         type="radio"
-                        id="NotIncluded"
                         defaultChecked="checked"
                         name="official"
                         onClick={this.handleChange}
                         value="2"
-                      />
-                    </Label>{" "}
+                        />
+                      
+                        <b>Official</b>
+                      </Label><br/>
+                        </FormGroup>
+                    {" "}
+                    <FormGroup check>
                     <Label
-                      htmlFor="#Included"
-                      className="btn btn-large btn-info"
-                    >
-                      <b>Unofficial</b>
+                      check
+                      >
+                      
                       <Input
                         type="radio"
-                        id="Included"
                         name="official"
                         onClick={this.handleChange}
                         value="1"
-                      />{" "}
-                    </Label>
-                    <Button type="submit" onClick={this.handleSubmit}>
+                        />{" "}
+                      <b>Unofficial</b>
+                      </Label><br/>
+                      </FormGroup>
+                        <br/>
+                    <Button type="submit" onClick={this.handleSubmit} disabled={!isEnabled}>
                       View {nextSport} Rankings
                     </Button>
                     <br />
                   </ListGroup>
                 </Form>
+                </CardTitle>
+                </Card>
               </Col>
-              <Col xs="6">
+          <Col>
+          <Card style={{padding:'25px'}}>
+              <CardTitle>
                 <h1>
                   {unofficial}
                   {sportName} Rankings
                 </h1>
+              </CardTitle>
+              <CardBody>
                 <ol> {participants} </ol>
+                </CardBody>
+                </Card>
               </Col>
         </Row>
-        <Row>
-          <Col>
-            charts
-          </Col>
-        </Row>
+       
       </Container>
     );
   }

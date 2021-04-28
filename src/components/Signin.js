@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { config } from './utility/Constants'
 
-let logo = "/logo2.png";
-let bg = "/bg2.jpg";
+
 class Signin extends Component {
 
   handleSubmit = event => {
@@ -24,7 +23,7 @@ class Signin extends Component {
       <div>
         <main>
         <form onSubmit={this.handleSubmit}>
-          <img src={logo} alt="logo" id="logo" width="50" height="50" />
+          <img src="" alt="logo" id="logo" width="50" height="50" />
           <label htmlFor="username">Username</label>
           <br />
           <input
@@ -57,7 +56,7 @@ class Signin extends Component {
             </a>
           </div>
         </form>
-        <img src={bg} alt="bg" className="run" />
+        <img src="" alt="bg" className="run" />
         </main>
       </div>
     );
