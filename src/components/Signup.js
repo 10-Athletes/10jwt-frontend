@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { config } from './utility/Constants'
-import "./Signup.module.css"
+// import "./Signup.module.css"
 
 let logo = "/logo2.png"
 let bg = "/bg.jpg"
@@ -25,10 +25,11 @@ class Signup extends Component {
     let url2 = config.url.BASE_URL + 'tokens'
 
     fetch(url,
-    { method: 'POST', body: formDataToken })
+    { method: 'POST', body: formData })
     .then(() =>
     fetch(url2,
     { method: 'POST', body: formDataToken}))
+    // eslint-disable-next-line
     .then(res => res.json()).then(res => (console.log(res.jwt),
     window.localStorage.setItem('jwt', res.jwt)))
     .then(() => this.props.history.push('/'))
@@ -97,14 +98,14 @@ class Signup extends Component {
               />
             </label>
             <div id="inlineSlot blueBtn">
-              <label for="register">
+              <label htmlFor="register">
                 {" "}
                 <button id="signin" type="submit">
                   Register
                 </button>
               </label>
               <a href="/signin">
-                <label id="signinLabel" for="signin">
+                <label id="signinLabel" htmlFor="signin">
                   {" "}
                   <button id="register" type="button">
                     Sign In

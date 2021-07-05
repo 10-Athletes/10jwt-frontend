@@ -56,7 +56,6 @@ export default class NewEvent extends Component {
         return response.json();
       }));
     }).then(function(data){
-      // console.log(user)
       this.setState({sports: data[0].sports, users: data[1].users, user})
 
     }.bind(this)).catch(function(error) {
@@ -83,6 +82,8 @@ export default class NewEvent extends Component {
     let teammateMatches = [...this.state.teammateMatches]
     if(event.target.name === 'sport'){
       sportMatches = this.findSports(event.target.value)
+      console.log("h")
+      console.log(sportMatches)
     } else if (event.target.name === 'opponent') {
       opponentMatches = this.findOpponent(event.target.value)
     }
@@ -147,7 +148,6 @@ export default class NewEvent extends Component {
                   rating = participant.rating
                 }
               });
-
               sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p, rating});
             }
           }
@@ -200,10 +200,12 @@ export default class NewEvent extends Component {
   var gamesPlayed = -2
   var error = ""
   // console.log(this.state.user)
-  this.state.user.sports.forEach((sport) => {
+
+  this.state.sportMatches.forEach((sport) => {
+    console.log(sport)
     if(sport.id === parseInt(event.target.attributes[1].value)){
       rating = sport.rating
-      gamesPlayed = sport.gamesPlayed
+      // gamesPlayed = sport.gamesPlayed
     }
   });
 
@@ -608,14 +610,14 @@ ratingChange(player){
     // return addToEventDB;
   }
 
-  updateCurrentUser(event, player){
+  updateCurrentUser(event, team){
     const { winner, opponents, teammates } = this.state;
-    let userID
-    if(player === 1){
-      userID = this.state.user.id
-    } else {
-      userID = event.p2ID
-    }
+    let userID = this.state.user.id
+    // if(team === 1){
+    //   userID = this.state.user.id
+    // } else {
+    //   userID = event.p2ID
+    // }
     let url = config.url.BASE_URL + 'users/' + userID
 
     // let updatedSport = {
@@ -625,43 +627,46 @@ ratingChange(player){
     // }
 
     let newEvent = {
-      sport: event.sport,
-      sportName: event.sportName,
-      p1ID: this.state.user.id,
-      p1Name: event.p1Name,
-      p1Username: event.p1Username,
-      p1InitialRating: parseFloat(event.p1InitialRating),
-      p2ID: event.p2ID,
-      p2Name: event.p2Name,
-      p2Username: event.p2Username,
-      winner,
-      opponents,
-      teammates
-    }
-    let user = {
-      username: this.state.user.username
-    }
-    // ADJUST TO FETCH!!!!
-    fetch(
-      url,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          sport: parseFloat(event.sport),
-          p1ID: this.state.user.id,
-          p1InitialRating: event.p1InitialRating,
-          p2ID: event.p2ID,
-          p2InitialRating: event.p2InitialRating,
-          winner: winner,
-          opponents,
-          teammates
-        })
+      newEvent: {
+        sport: event.sport,
+        // sportName: event.sportName,
+        // p1ID: this.state.user.id,
+        // p1Name: event.p1Name,
+        // p1Username: event.p1Username,
+        p1InitialRating: parseFloat(event.p1InitialRating),
+        // p2ID: event.p2ID,
+        // p2Name: event.p2Name,
+        // p2Username: event.p2Username,
+        winner,
+        opponents,
+        teammates
       }
-    )
+    }
+    // let user = {
+    //   username: this.state.user.username
+    // }
+
+
+    // fetch(
+    //   url,
+    //   {
+    //     method: 'POST',
+    //     headers: {
+    //       'Accept': 'application/json',
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({
+    //       sport: parseFloat(event.sport),
+    //       p1ID: this.state.user.id,
+    //       p1InitialRating: event.p1InitialRating,
+    //       p2ID: event.p2ID,
+    //       p2InitialRating: event.p2InitialRating,
+    //       winner: winner,
+    //       opponents,
+    //       teammates
+    //     })
+    //   }
+    // )
     fetch(
       url, {
         method: 'PATCH',
@@ -670,33 +675,39 @@ ratingChange(player){
           'Content-Type': 'application/json'
         },
         body: JSON.stringify
-        ({
-          newEvent,
-          user
-        })
+        // ({
+          (newEvent),
+        //   user
+        // })
       }
     )
     .then(response => {
-      if(response.data.updated){
-        this.props.history.push('/profile', {detail: event.sport, winner})
-      }
+      console.log(response)
+      // if(response.data.updated){
+      //   this.props.history.push('/profile', {detail: event.sport, winner: winner})
+      // }
     })
 
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    const { opponentMatches, sportMatches, opponentID, sportID, sports, opponentName, opponentUsername, opponents, teammates } = this.state
+    const { opponentMatches, winner, sportMatches, opponentID, sportID, sports, opponentName, opponentUsername, opponents, teammates } = this.state
     let oppName = opponentName
     let oppUsername = opponentUsername
-    if((opponentMatches.length > 0 || opponentID !== 0) && (sportMatches.length > 0 || sportID !== 0)){
+    if((opponentMatches.length > 0 || opponentID !== 0 || opponents.length > 0) && (sportMatches.length > 0 || sportID !== 0)){
       let actualSportID, p1InitialRating, p2ID, p2InitialRating, sportName
       if(opponentMatches.length > 0){
         p2ID = opponentMatches[0].id
         oppName = opponentMatches[0].name
         oppUsername = opponentMatches[0].username
       } else {
-        p2ID = opponentID
+        let p2IDs = []
+        opponents.forEach((opponent) => {
+          p2IDs.push(opponent.id)
+        });
+
+        // p2ID = opponentID
       }
       if(sportMatches.length > 0){
         actualSportID = sportMatches[0].id
@@ -748,34 +759,45 @@ ratingChange(player){
       if(p1InitialRating === undefined){
         this.setState({error: "You need to set an initial skill level."})
       } else {
+        // let event =
+        // {
+        //   sport: actualSportID,
+        //   p1ID: this.state.user.id,
+        //   p1Name: this.state.user.firstname + ' ' + this.state.user.lastname,
+        //   p1Username: this.state.user.username,
+        //   p1InitialRating,
+        //   p2ID,
+        //   p2Name: oppName,
+        //   p2Username: oppUsername,
+        //   p2InitialRating,
+        //   sportName,
+        //   opponents,
+        //   teammates
+        // }
         let event =
         {
           sport: actualSportID,
-          p1ID: this.state.user.id,
-          p1Name: this.state.user.firstname + ' ' + this.state.user.lastname,
-          p1Username: this.state.user.username,
           p1InitialRating,
-          p2ID,
-          p2Name: oppName,
-          p2Username: oppUsername,
-          p2InitialRating,
-          sportName,
           opponents,
-          teammates
+          teammates,
+          winner
         }
-        console.log("sport id: ", actualSportID)
-        console.log("p1ID: ", this.state.user.id)
-        console.log("p1 Name: ", this.state.user.firstname + ' ' + this.state.user.lastname,)
-        console.log("p1Username: ", this.state.user.username)
-        console.log("p1 rating: ", p1InitialRating)
-        console.log("p2ID: ", p2ID)
-        console.log("p2name: ", oppName)
-        console.log("p2user: ", oppUsername)
-        console.log("p2 initial: ", p2InitialRating)
-        console.log("sportname: ", sportName)
-        console.log("opponents", opponents)
+        console.log(event)
+        // console.log("p1:")
+        // console.log(this.state.user)
+        // console.log("sport id: ", actualSportID)
+        // console.log("p1ID: ", this.state.user.id)
+        // console.log("p1 Name: ", this.state.user.firstname, ' ', this.state.user.lastname,)
+        // console.log("p1Username: ", this.state.user.username)
+        // console.log("p1 rating: ", p1InitialRating)
+        // // console.log("p2ID: ", p2ID)
+        // // console.log("p2name: ", oppName)
+        // // console.log("p2user: ", oppUsername)
+        // // console.log("p2 initial: ", p2InitialRating)
+        // console.log("sportname: ", sportName)
+        // console.log("opponents", opponents)
         // this.addEventsToEventsDatabase(event)
-        // this.updateCurrentUser(event, 1)
+        this.updateCurrentUser(event, 1)
       }
     } else {
       this.setState({ error: "You need to select a valid opponent and a valid sport."})
@@ -810,23 +832,21 @@ ratingChange(player){
           team.push(<li style={{listStyle: 'none'}} key={`${teammateOrOpponent}#${i}`}><button onClick={() => this.removePlayer(i, teammateOrOpponent)}>X</button>{teammate.name}: {rating.toFixed(2)}</li>)
         } else {
           unratedTeammates.push(i)
-          team.push(teammate.name)
+          team.push(<li style={{listStyle: 'none'}} key={`${teammateOrOpponent}#${i}`}><button onClick={() => this.removePlayer(i, teammateOrOpponent)}>X</button>{teammate.name}</li>)
         }
       });
       if(teammateOrOpponent === 'teammate'){
         let rating = 0
         let a = team.length
-        this.state.user.sports.forEach((sportPlayed) => {
-          if(parseInt(sportPlayed.id) === parseInt(sport) && sportPlayed.rating){
-            teamRating += sportPlayed.rating
-            ratedMembers += 1
-            rating = sportPlayed.rating
-            team.push(<li style={{listStyle: 'none'}} key='player'><button onClick={() => this.removePlayer(a, teammateOrOpponent)}>X</button>{this.state.user.firstname + ' ' + this.state.user.lastname}: {rating.toFixed(2)}</li>)
-          }
-        });
+        if (this.state.sportMatches[0].rating && this.state.sportMatches[0].rating > 0){
+          teamRating += this.state.sportMatches[0].rating
+          ratedMembers += 1
+          rating = this.state.sportMatches[0].rating
+          team.push(<li style={{listStyle: 'none'}} key='player'><button onClick={() => this.removePlayer(a, teammateOrOpponent)}>X</button>{this.state.user.firstname + ' ' + this.state.user.lastname}: {rating.toFixed(2)}</li>)
+        }
         if(rating === 0) {
           unratedTeammates.push(unratedTeammates.length)
-          team.push(`${this.state.user.firstname} ${this.state.user.lastname}`)
+          team.push(<li style={{listStyle: 'none'}} key='player'><button onClick={() => this.removePlayer(a, teammateOrOpponent)}>X</button>{this.state.user.firstname + ' ' + this.state.user.lastname}</li>)
         }
       }
       if(ratedMembers > 0){
@@ -876,17 +896,20 @@ ratingChange(player){
     });
 
     if(this.state.sportMatches.length >= 1 && this.state.sportMatches[0].rating === 0){
+      // console.log("start")
       // console.log(this.state.sportMatches[0])
+      // console.log("end")
+      // console.log(this.state.sportMatches[0].participants)
       setInitialRating =
       <div>
-        <h3>Rate Your {this.state.sportMatches[0].name} Skill Level Between 1 and 10:</h3>
+        <h3>Rate Your {this.state.sportMatches[0].name} Skill Between 1 and 10:</h3>
         <input
         type="number"
         name="initial"
         value={this.state.initial}
         onChange={this.handleChange}
         placeholder="Set Skill Level 1-10"
-        step='.5'
+        step='.01'
         min='1.0'
         max="10.00000000000000"
         required

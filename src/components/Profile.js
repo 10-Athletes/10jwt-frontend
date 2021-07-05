@@ -14,7 +14,8 @@ export default class Profile extends Component {
     sportMatches: [],
     error: "",
     changed: 0,
-    username: ""
+    username: "",
+    bonusSports: []
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -77,12 +78,19 @@ export default class Profile extends Component {
     let nothingPlayed = []
     let athlete
     this.state.user.sports.forEach((sport) => {
-      if (sport.id !== 10 && sport.opponents.length >=5){
+      console.log(sport)
+      if (sport.id !== "10" && sport.opponents.length >=5){
         official.push(sport)
-      } else if (sport.id !== 10 && sport.opponents.length > 0) {
+      } else if (sport.id !== "10" && sport.opponents.length > 0) {
         unofficial.push(sport)
-      } else if (sport.id !== 10){
+      } else if (sport.id !== "10"){
         nothingPlayed.push(sport)
+        if(this.state.bonusSports.length > 0){
+          this.state.bonusSports.forEach((addedSport) => {
+            nothingPlayed.push(addedSport)
+          });
+
+        }
       }
       else {
         athlete = sport
@@ -279,6 +287,16 @@ export default class Profile extends Component {
       }));
     }).then(function(data){
       console.log(data)
+      let a = this.state.bonusSports
+      a.push({
+        id: sportID,
+        name: sport,
+        rating: parseFloat(rating),
+        opponents: [],
+        official: false
+      })
+      this.setState({bonusSports: a})
+      // eslint-disable-next-line
     }.bind(this))
     .catch(function(error) {
       console.log(error)
@@ -355,10 +373,10 @@ export default class Profile extends Component {
           if(sport === ""){
             sportsPlayed.push(<br key={`skip${i}`}/>)
           } else {
-            if ((sport.id === 10 && sport.official === true) || (sport.id !== 10 && sport.opponents.length >= 5)){
+            if ((sport.id === "10" && sport.official === true) || (sport.id !== "10" && sport.opponents.length >= 5)){
               officialOrNot = official
               fontSize="larger"
-              if(sport.id !== 10){
+              if(sport.id !== "10"){
 
                 sportsPlayed.push(
                   <div
@@ -372,7 +390,7 @@ export default class Profile extends Component {
                 )
               }
             } else {
-              if(sport.id !== 10){
+              if(sport.id !== "10"){
                 officialOrNot = unofficial
                 if (sport.opponents.length > 1){
                   sOrNot = s
@@ -408,7 +426,7 @@ export default class Profile extends Component {
               }
             }
 
-            if(sport.id === 10){
+            if(sport.id === "10"){
               athlete = <h2 className="AthleteRating" key={sport.id}>Athlete Rating: {sport.rating.toFixed(2)}{officialOrNot}{officialOrNot}</h2>
             }}
         }});
@@ -444,7 +462,7 @@ export default class Profile extends Component {
           />
           <input
             type="number"
-            step=".5"
+            step=".1"
             name="rating"
             min="1.0"
             max="10.00000000000"

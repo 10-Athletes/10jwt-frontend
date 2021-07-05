@@ -13,6 +13,7 @@ class Signin extends Component {
     let url = config.url.BASE_URL + 'tokens'
     fetch(url,
     { method: 'POST', body: formData })
+    // eslint-disable-next-line
     .then(res => res.json()).then(res => (console.log(res.jwt),
     window.localStorage.setItem('jwt', res.jwt)))
     .then(() => this.props.history.push('/'))
