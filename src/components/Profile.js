@@ -61,7 +61,13 @@ export default class Profile extends Component {
         if(user.events){
           user.sports.forEach((sport) => {
             if(sport.id === detail){
-              ratingChange = Math.abs(sport.rating - user.events[user.events.length - 1].p1InitialRating).toFixed(3)
+              // console.log(user.events[user.events.length - 1])
+              user.events[user.events.length - 1].team1.forEach((player) => {
+                if(player.id  === user.id){
+                  ratingChange = Math.abs(player.ratingChange).toFixed(3)
+                }
+              });
+
             }
           });
         }
@@ -78,26 +84,19 @@ export default class Profile extends Component {
     let nothingPlayed = []
     let athlete
     this.state.user.sports.forEach((sport) => {
-      console.log(sport)
       if (sport.id !== "10" && sport.opponents.length >=5){
         official.push(sport)
       } else if (sport.id !== "10" && sport.opponents.length > 0) {
         unofficial.push(sport)
       } else if (sport.id !== "10"){
         nothingPlayed.push(sport)
-        if(this.state.bonusSports.length > 0){
-          this.state.bonusSports.forEach((addedSport) => {
-            nothingPlayed.push(addedSport)
-          });
-
-        }
       }
       else {
         athlete = sport
       }
     })
     let sports = [athlete]
-    return sports.concat(this.quickSort(official), [""], this.quickSort(unofficial), [""], this.quickSort(nothingPlayed))
+    return sports.concat(this.quickSort(official), [""], this.quickSort(unofficial), [""], this.quickSort(nothingPlayed.concat(this.state.bonusSports)))
   }
 
   quickSort(sports) {
@@ -286,8 +285,8 @@ export default class Profile extends Component {
         return response.json();
       }));
     }).then(function(data){
-      console.log(data)
       let a = this.state.bonusSports
+
       a.push({
         id: sportID,
         name: sport,
@@ -343,7 +342,7 @@ export default class Profile extends Component {
     let anyUnofficial = false
     let anyUnplayed = false
 
-    if(this.state.user.sports && this.state.user.sports.length > 0){
+    if((this.state.user.sports && this.state.user.sports.length > 0) || (this.state.bonusSports && this.state.bonusSports.length > 0)){
 
       let sports = this.sortedSportsList()
 
@@ -352,7 +351,8 @@ export default class Profile extends Component {
         let weight = 'normal'
         let fontSize = 'inherit'
         if(sport){
-          if(sport.id === this.state.changed){
+          // eslint-disable-next-line
+          if(sport.id == this.state.changed){
             weight = 'bold'
             fontSize = 'larger'
             if(this.state.winner === '1'){
@@ -481,8 +481,8 @@ export default class Profile extends Component {
           <h3 style={{color: "red"}}>{this.state.error}</h3>
         </form>
         <br/>
-        <h4>* : Unofficial rating. You must play at least five unique opponents in a sport before your rating is official.<br />
-        ** : For your athlete rating to be official you must have at least one official sport.</h4>
+        <div>* : Unofficial rating. You must play at least five unique opponents in a sport before your rating is official.<br />
+        ** : For your athlete rating to be official you must have at least one official sport.</div>
         </ul>
       </div>
     )}

@@ -683,9 +683,9 @@ ratingChange(player){
     )
     .then(response => {
       console.log(response)
-      // if(response.data.updated){
-      //   this.props.history.push('/profile', {detail: event.sport, winner: winner})
-      // }
+      if(response.status === 200){
+        this.props.history.push('/profile', {detail: event.sport, winner: winner})
+      }
     })
 
   }
@@ -782,7 +782,7 @@ ratingChange(player){
           teammates,
           winner
         }
-        console.log(event)
+        // console.log(event)
         // console.log("p1:")
         // console.log(this.state.user)
         // console.log("sport id: ", actualSportID)
@@ -909,7 +909,7 @@ ratingChange(player){
         value={this.state.initial}
         onChange={this.handleChange}
         placeholder="Set Skill Level 1-10"
-        step='.01'
+        step='.1'
         min='1.0'
         max="10.00000000000000"
         required
