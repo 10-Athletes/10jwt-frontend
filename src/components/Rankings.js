@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode';
+import { Button, Form, Container, Table, InputGroup, OffCanvas, Row, Col, Card, ListGroup, Popover, OverlayTrigger, CloseButton, Tooltip } from 'react-bootstrap';
+import styles from './Rankings.css'
+
+
 
 import { config } from './utility/Constants'
 
@@ -13,13 +17,18 @@ export default class Rankings extends Component {
       sportMatches: [],
       sportID: 10,
       unsetID: 0,
-      official: '2'
+      official: '2',
+      error: "",
+      searchResultsClass: "d-none",
+      officialChecked: true
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.fillSportName = this.fillSportName.bind(this);
     this.findSports = this.findSports.bind(this);
+    this.showSearchResults = this.showSearchResults.bind(this);
+    this.hideSearchResults = this.hideSearchResults.bind(this);
   }
 
   componentDidMount() {
@@ -27,8 +36,8 @@ export default class Rankings extends Component {
     let user = {}
     if(jwt){
       let result = jwtDecode(jwt)
-      if(result.user){
-        user = result.user
+      if(result){
+        user = result
       }
     }
     let url = config.url.BASE_URL + 'sports'
@@ -65,13 +74,23 @@ export default class Rankings extends Component {
 
   handleChange(event) {
     let sportMatches = [...this.state.sportMatches]
+    let officialChecked = this.state.officialChecked
     if(event.target.name === 'sport'){
       sportMatches = this.findSports(event.target.value)
     }
+    if(event.target.name === 'official'){
+      if(event.target.value === "2"){
+        officialChecked = true
+      } else {
+        officialChecked = false
+      }
+    }
+
 
     this.setState({
       [event.target.name]: event.target.value,
       sportMatches,
+      officialChecked
     });
   }
 
@@ -136,27 +155,40 @@ export default class Rankings extends Component {
   }
 
   fillSportName(event){
+    event.preventDefault()
   let sportMatches = [{
-    name: event.target.attributes[2].value,
-    id: event.target.attributes[1].value,
+    name: event.target.attributes[1].value,
+    id: event.target.attributes[0].value,
   }]
   this.setState({
-    sport: event.target.attributes[2].value,
-    unsetID: parseInt(event.target.attributes[1].value),
+    sport: event.target.attributes[1].value,
+    unsetID: parseInt(event.target.attributes[0].value),
     sportMatches,
+    searchResultsClass: "d-none"
   })
+ }
+
+ showSearchResults(){
+   this.setState({searchResultsClass: "mb-3 sport-search-list"})
+ }
+
+ hideSearchResults(e){
+     this.setState({searchResultsClass: "d-none"})
  }
 
  handleSubmit(event){
   event.preventDefault();
-  this.state.sports.forEach((sport) => {
-    if(sport.id === this.state.unsetID){
-      this.setState({sportID: sport.id, unsetID: 0})
-    } else if (this.state.unsetID === 0 && this.state.sportMatches.length > 0) {
-      this.setState({sportID: this.state.sportMatches[0].id})
-    }
-  });
-
+  if(this.state.sport !== ""){
+    this.state.sports.forEach((sport) => {
+      if(sport.id === this.state.unsetID){
+        this.setState({sportID: sport.id, unsetID: 0, sport: "", error: ""})
+      } else if (this.state.unsetID === 0 && this.state.sportMatches.length > 0) {
+        this.setState({sportID: this.state.sportMatches[0].id, sport: "", sportMatches: [], error: ""})
+      }
+    });
+  } else {
+    this.setState({error: "Sport field can't be blank"})
+  }
 }
 
   quickSort(participants) {
@@ -181,6 +213,7 @@ export default class Rankings extends Component {
 
   render() {
     let participants = []
+    let sportsListClassName = this.state.searchResultsClass
     let nextSport = ""
     let sportName = ""
     let unofficial = this.state.official === '1' ? "Unofficial " : ""
@@ -188,21 +221,39 @@ export default class Rankings extends Component {
     if(this.state.sportMatches.length > 0){
       nextSport = this.state.sportMatches[0].name
     }
+    let officialCount = 0
     this.state.sports.forEach((sport, i) => {
       if(sport.id === this.state.sportID){
         sportName = sport.name
         let sorted = this.quickSort(sport.participants)
-        sorted.forEach((participant) => {
+        sorted.forEach((participant, i) => {
           let fontWeight = 'normal'
+          let link = '/profile/' + participant.id.toString()
           if(participant.id === this.state.user.id){
             fontWeight = 'bold'
+            link = '/profile'
           }
           let officialOrNot = "*"
           if((sport.id !== 10 && participant.opponents.length >= 5) || (sport.id === 10 && participant.official)){
             officialOrNot = ""
+            officialCount = officialCount + 1
           }
           if((this.state.official === '2' && ((sport.id !== 10 && participant.opponents.length >= 5) || (sport.id === 10 && participant.official))) || this.state.official === '1'){
-            participants.push(<li style={{fontWeight: fontWeight}} key={participant.id} ><div style={{float: 'left'}}>{participant.name}</div><div style={{float: 'right'}}>{officialOrNot}{participant.rating.toFixed(2)}</div></li>)
+            let count = i+1
+            if(this.state.official === '2'){
+              count = officialCount
+            }
+            let best = ""
+            if(i === 0){
+              best = <span className="d-none d-sm-block"><br/>Best {sport.wordForPlayer} in the world</span>
+            }
+            participants.push(
+              <tr style={{fontWeight: fontWeight}} key={participant.id}>
+                <td className="text-center">{count}</td>
+                <td><a href={link}>{participant.name}</a>{best}</td>
+                <td className="text-center">{participant.rating.toFixed(2)}{officialOrNot}</td>
+              </tr>
+            )
           }
         });
 
@@ -216,7 +267,7 @@ export default class Rankings extends Component {
           }
         });
         if(!unsetIncluded) {
-          sportList.push(<div className="sportsListItem" id={sport.id} key={`sport${sport.id}`} name={sport.name}>{sport.name}</div>)
+          sportList.push(<ListGroup.Item action className="text-center sports-list-item" id={sport.id} key={`sport${sport.id}`} name={sport.name}>{sport.name}</ListGroup.Item>)
         }
         nextSport = sport.name
       }
@@ -226,38 +277,135 @@ export default class Rankings extends Component {
 
     }
     this.state.sportMatches.forEach((sport) => {
-      sportList.push(<div className="sportsListItem" id={sport.id} key={`sport${sport.id}`} name={sport.name}>{sport.name}</div>)
+      sportList.push(<ListGroup.Item action className="text-center sports-list-item" id={sport.id} key={`sport${sport.id}`} name={sport.name}>{sport.name}</ListGroup.Item>)
     });
 
 
     return(
-      <div>
-      <form style={{float: 'left', paddingLeft: "5%"}}>
-        <br/>
-          <h3>Sport:</h3>
-          <input
-            type="name"
-            name="sport"
-            placeholder="Sport Name"
-            value={this.state.sport}
-            onChange = {this.handleChange}
-            required
-          />
-          <ul className="sportSearchList" onClick={this.fillSportName}
-          >{sportList}</ul>
+      <div style={{paddingTop: "3%", paddingBottom: "1%", fontSize: "larger"}}>
+      <Container className="d-block d-lg-none pb-3">
+        <Row>
+          <Col>
+          .
+          </Col>
+        </Row>
+      </Container>
+      <Container fluid className="my-5">
+        <Row className="d-block d-lg-none">
+          <Card className="pb-3 mb-3 ">
+          <Form className="">
+            <Col xs="12">
+              <InputGroup className="mb-3" controlId="sport">
+                <Form.Control
+                  name="sport"
+                  type="text"
+                  placeholder="   Sport Name"
+                  value={this.state.sport}
+                  onChange={this.handleChange}
+                  onFocus={this.showSearchResults}
+                  onBlur={()=> setTimeout(() => this.hideSearchResults(), 1200)}
+                  required />
+                  <Button type="submit" className="ml-3"  variant="success" onClick={this.handleSubmit}><b>View {nextSport}</b></Button>
+
+              </InputGroup>
+              <ListGroup className={sportsListClassName} onClick={this.fillSportName}
+            >{sportList}</ListGroup>
+
+              <div key='small-screen-official' className="text-center official-or-not">
+                <Form.Check
+                  inline
+                  type='radio'
+                  name="official"
+                  id="Not Included"
+                  label='Official'
+                  value="2"
+                  onClick={this.handleChange}
+                  className="mb-2"
+                  defaultChecked="checked"
+                />
+
+                <Form.Check
+                  inline
+                  name="official"
+                  type='radio'
+                  label='Unofficial'
+                  id="Included"
+                  value="1"
+                  onClick={this.handleChange}
+
+                />
+              </div>
+            </Col>
+
+          </Form>
+          </Card>
+        </Row>
+        <Row>
+        <Col className="d-none d-lg-block">
+          <Form className="mx-3 mt-5" >
+            <Form.Group className="mb-3" controlId="sport">
+              <Form.Control
+                size="lg"
+                name="sport"
+                type="text"
+                placeholder="   Sport Name"
+                value={this.state.sport}
+                onChange={this.handleChange}
+                required />
+
+              </Form.Group>
+            <ListGroup className="sportSearchList" onClick={this.fillSportName}
+          >{sportList}</ListGroup>
           <br />
-          <input type="radio" id="Not Included" defaultChecked="checked" name="official" onClick={this.handleChange} value= '2' /> <b>Official</b>
-          <br />
-          <input type="radio" id="Included" name="official" onClick={this.handleChange} value= '1' /> <b>Unofficial</b>
-          <br /><br /><br/>
-          <button type="submit" onClick={this.handleSubmit}>See {nextSport} Rankings</button>
+          <div key='official' style={{marginLeft: '30%', marginRight: '20%'}} className="mb-5 official-or-not">
+            <Form.Check
+              type='radio'
+              name="official"
+              id="Not Included"
+              label='Official'
+              value="2"
+              onClick={this.handleChange}
+              className="mb-2"
+              checked={this.state.officialChecked}
+            />
+
+            <Form.Check
+              name="official"
+              type='radio'
+              label='Unofficial'
+              id="Included"
+              value="1"
+              onClick={this.handleChange}
+              checked={!  this.state.officialChecked}
+
+            />
+          </div>
+
+          <Button type="submit" variant="success" size="lg" className="w-100" onClick={this.handleSubmit}><b>View {nextSport}</b></Button> <br/> <br/>
+          <span style={{color: "red"}}><b>{this.state.error}</b></span>
 
 
           <br/>
           <br/>
-        </form>
-        <h1 style={{textAlign: 'center', paddingLeft: '30%', paddingRight: '30%'}}>{unofficial}{sportName} Rankings</h1>
-        <ol style={{paddingLeft: '30%', paddingRight: '30%'}}> {participants} </ol>
+        </Form>
+        </Col>
+        <Col xs="12" lg="9" >
+        <h1 style={{textAlign: 'center'}}>{unofficial}{sportName} World Rankings</h1>
+        <Table className="rankings-list" bordered striped hover>
+          <thead>
+            <tr>
+              <th className="px-3" style={{width: '1px'}}>Rank</th>
+              <th>Name</th>
+              <th className="px-3" style={{width: '1px'}}>Rating</th>
+            </tr>
+          </thead>
+          <tbody>
+            {participants}
+          </tbody>
+        </Table>
+        </Col>
+        </Row>
+        </Container>
       </div>
     )
   }

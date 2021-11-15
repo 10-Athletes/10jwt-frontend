@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
+import {BrowserView, MobileView} from 'react-device-detect';
 import { config } from './utility/Constants'
 import Background from './bg.jpeg'
-import { Button, Form, Container, Row, Col, Modal, Card, CloseButton } from 'react-bootstrap';
+import { Button, Form, Container, Row, Col, Modal } from 'react-bootstrap';
 import styles from './Signin.css'
-import jwtDecode from 'jwt-decode'
-
 
 
 // let logo = "/logo2.png";
@@ -15,19 +14,6 @@ class Signin extends Component {
     this.state={
       open: false,
       errors: []
-    }
-  }
-
-  componentDidMount(){
-    let user = {}
-    let jwt = window.localStorage.getItem('jwt');
-    if(jwt){
-      let result = jwtDecode(jwt)
-      if(result.username){
-        user = result
-      } else{
-        this.props.history.push('/rankings')
-      }
     }
   }
 
@@ -107,7 +93,7 @@ class Signin extends Component {
     .then(res => res.json()).then(res => (console.log(res.jwt),
     window.localStorage.setItem('jwt', res.jwt)))
     .then(() => this.props.history.push('/'))
-    .catch(setTimeout(() => this.setState({errors: ["Invalid username or password"]}), 500))
+    .catch(function(error){console.log('There is an error: ', error.message)})
   }
 
   handleRegisterSubmit = event => {
@@ -140,7 +126,7 @@ class Signin extends Component {
         this.props.history.push('/')
         this.setState({ open: false, errors: [] });
       })
-      .catch(setTimeout(() => this.setState({errors: ["Username already in use"]}), 500))
+      .catch(function(error){console.log('There is an error: ', error.message)})
     } else {
       this.setState({errors: errorsFound})
     }
@@ -151,102 +137,113 @@ class Signin extends Component {
 
   render() {
     return (
-      <Container fluid style={{marginTop: "5%"}}>
-        <Row>
-        <Col xl="1">
-        </Col>
-          <Col xl="6">
-
-      <div className="d-none d-xl-block text-center" style={{marginTop: "5%", height: '20vh', fontFamily: "boogaloo", fontSize: '15vh'}}>
-      <span className="ten-logo"><span style={{letterSpacing: "-10px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span>
+      <div>
+      <MobileView>
+      <div>
+      <br/>
+        <main style={{backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '75vh', width: '100vw'}}>
+        <div align="center" style={{fontFamily: "Shadows Into Light", fontSize: '5.5vh'}}>
+        <span style={{fontSize: '6.5vh', color: "#0046C4"}}>10</span>Athletes
+        </div>
+        <form align="center" style={{fontSize: 'xx-large'}} onSubmit={this.handleSubmit}>
+        <div align="center" style={{marginTop: "3vh", marginLeft: '20%', marginRight: '20%', backgroundColor: "white", border: "3px solid #435685", width: "60%"}}>
+          <br/><b>Sign In</b><br/><br/>
+          <label htmlFor="username"></label>
+          <input
+            style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+            type="username"
+            id="username"
+            name="username"
+            placeholder="   Username"
+            ref={(node) => {
+              this.inputNode1 = node;
+            }}
+          />
+          <br />
+          <br/>
+          <label htmlFor="password"></label>
+          <input
+            style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+            type="password"
+            id="password"
+            name="password"
+            placeholder="   Password"
+            ref={(node) => {
+              this.inputNode2 = node;
+            }}
+          />
+          <br/><br/>
+          <div id="inlineSlot " align="center">
+            <button type="submit" value="Sign In" style={{color: "white", backgroundColor: "#42B729", width: '40%', height: '3em', fontSize: "large"}}>
+              <b style={{fontSize: "x-large"}}>Sign In</b>
+            </button>
+            <br/><br/>
+            <span style={{fontSize: "x-large"}}>Not Registered? <br/><a href="/register">Sign Up</a> for a <br/>Free Account</span><br/><br/>
+          </div>
+          </div>
+        </form>
+        </main>
       </div>
-      <div className="d-block d-xl-none text-center" style={{marginTop: "15%", height: '4vh', fontFamily: "boogaloo", fontSize: '4vh'}}>
-      <span className="ten-logo"><span style={{letterSpacing: "-4px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span>
+      </MobileView>
+      <BrowserView>
+      <div>
+      <br/>
+      <br/>
+      <br/>
+      <div style={{float: 'left', width: "50%"}}>
+      <div style={{marginLeft: "10%", marginTop: "5vh", height: '17.5vh', fontFamily: "Copperplate", fontSize: '15vh'}}>
+      10Athletes
       </div>
-      <Card className="border-0 d-none d-xl-block" style={{backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '100%', paddingBottom: '9.5vh'}}>
-      </Card>
-          </Col>
-          <Col xl="1">
-          </Col>
-          <Col xl="4" className="mt-5 pt-5" xl="3">
-        <div>
-        <span className="d-none d-xl-block" style={{marginTop: "15%"}}></span>
-        <Card className="shadow d-xl-block" style={{backgroundColor: "#eee"}}>
-        <Form align="center" style={{fontSize: 'xx-large'}} onSubmit={this.handleSubmit}>
-        <Row className="px-3 my-4">
-          <Col xs="12">
-            <Form.Group>
+      <div style={{marginLeft: "5%", backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '49.5vh', paddingBottom: '9.5vh'}}>
+      </div>
+      </div>
+        <main >
 
-            <Form.Control
-              size="lg"
-              id="usernameInput"
-              placeholder="  Username or Email"
-              type="name"
-              name="username"
-              required
-              isInvalid={!!this.state.errors.username}
-              ref={(node) => {
-                this.inputNode1 = node;
-              }}
-            />
-            <Form.Control.Feedback className="error-message" type='invalid'>
-              { this.state.errors.username }
-            </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row className="px-3">
-          <Col xs="12">
-            <Form.Group>
-
-              <Form.Control
-                size="lg"
-                className="mb-2"
-                id="passwordInput"
-                placeholder="  Password"
-                type="password"
-                name="password"
-                required
-                isInvalid={!!this.state.errors.password}
-                ref={(node) => {
-                  this.inputNode2 = node;
-                }}
-              />
-              <Form.Control.Feedback className="error-message" type='invalid'>
-                { this.state.errors.password }
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-
-          <div id="inlineSlot " align="center" className="">
-
-            <Col xs="12">
-            <Button className="mt-3 mb-4 w-100"size="lg" type="submit" value="Sign In" >
+        <form align="center" style={{fontSize: 'xx-large'}} onSubmit={this.handleSubmit}>
+        <div align="center" style={{marginTop: "10vh", marginLeft: '57.5%', marginRight: '17.5%', backgroundColor: "#eee", border: "3px solid #435685", width: "25%"}}>
+        <br/>
+          <label htmlFor="username"></label>
+          <input
+            style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+            type="username"
+            id="username"
+            name="username"
+            placeholder="   Username"
+            ref={(node) => {
+              this.inputNode1 = node;
+            }}
+          />
+          <br />
+          <br/>
+          <label htmlFor="password"></label>
+          <input
+            style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+            type="password"
+            id="password"
+            name="password"
+            placeholder="   Password"
+            ref={(node) => {
+              this.inputNode2 = node;
+            }}
+          />
+          <br/><br/>
+          <div id="inlineSlot " align="center" style={{marginLeft: "10%", marginRight: "10%"}}>
+            <Button size="lg" type="submit" value="Sign In" block>
               <b>Sign In</b>
             </Button>
-            </Col>
-            <Col className="mb-3 sign-in-error text-center">
-              {this.state.errors[0]}
-            </Col>
-            <Row className="mx-3" style={{marginLeft: "10%", marginRight: "10%", borderBottom: "1px solid #435685"}}>
-            </Row>
-            <Row>
-              <Col xs="12">
-                <Button size="lg" className="signupButton my-4 w-50" variant="success" onClick={this.openModal}><b>Sign Up</b></Button>
-              </Col>
-            </Row>
+            <br/>
+            <div style={{paddingLeft: "10%", paddingRight: "10%", borderBottom: "1px solid #435685"}}></div>
+            <br/>
+            <span><Button size="lg" className="px-5 signupButton" variant="success" onClick={this.openModal}><b>Sign Up</b></Button></span><br/><br/>
           </div>
-
           <Modal backdrop="static" centered show={this.state.open} onHide={this.closeModal}>
-              <Modal.Header>
+              <Modal.Header closeButton>
                 <Modal.Title>Sign Up</Modal.Title>
-                <CloseButton onClick={this.closeModal}>X</CloseButton>
               </Modal.Header>
               <Modal.Body>
               <Form onSubmit={this.handleRegisterSubmit}>
               <Row className="pl-3 pr-3 mt-4">
-                <Col xs="12" xl="6" className="mb-4">
+                <Col xs="12" lg="6" className="mb-4">
                   <Form.Group>
                   <Form.Control
                     size="lg"
@@ -265,7 +262,7 @@ class Signin extends Component {
                   </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
-                <Col xs="12" xl="6" className="mb-4">
+                <Col xs="12" lg="6" className="mb-4">
                   <Form.Group>
 
                   <Form.Control
@@ -354,16 +351,9 @@ class Signin extends Component {
                   </Form.Group>
                 </Col>
               </Row>
-              <Container>
-              <Row className="error-username-taken">
-              <Col className="text-center mx-auto">
-              {this.state.errors[0]}
-              </Col>
-              </Row>
-              </Container>
               <Row>
                 <Col xs="4"></Col>
-                <Col className="mt-4 mb-3" xs="6" lg="4">
+                <Col className="mt-4 mb-3" xs="4">
                 <Button size="lg" type="submit" variant="success" onClick={this.handleRegisterSubmit}>
                   Sign Up
                 </Button>
@@ -372,14 +362,14 @@ class Signin extends Component {
               </Form>
               </Modal.Body>
             </Modal>
-            </Form>
 
-          </Card>
-        </div>
-
-            </Col>
-          </Row>
-        </Container>    );
+          </div>
+        </form>
+        </main>
+      </div>
+      </BrowserView>
+      </div>
+    );
   }
 
 }

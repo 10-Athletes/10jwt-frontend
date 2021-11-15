@@ -1,0 +1,18 @@
+.btn-close {
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.modal-title {
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+.error-username-taken{
+  color: red;
+}
+
+.sign-in-error{
+  color: red;
+  font-size: 60%;
+}

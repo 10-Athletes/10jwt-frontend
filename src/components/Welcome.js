@@ -15,6 +15,7 @@ class Welcome extends Component {
   }
 
   componentDidMount(){
+    // console.log(this.props)
     let jwt = window.localStorage.getItem('jwt');
     if(jwt){
       let result = jwtDecode(jwt)
@@ -40,8 +41,6 @@ class Welcome extends Component {
   render(){
     return(
       <div>
-      <button onClick={this.handleLogout}>Logout</button><br />
-      <button onClick={this.handleProfileClick}>Profile</button><br />
         <h1>hello {this.state.username}</h1>
       </div>
     )

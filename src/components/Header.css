@@ -1,0 +1,52 @@
+.nav-link.active {
+  color: white !important;
+}
+
+.form-group {
+  width: auto;
+}
+
+.error-message{
+  font-size: 111%;
+}
+
+.or{
+  padding-left: 48vw;
+}
+
+.navbar-brand{
+  font-family: "boogaloo";
+  font-size: 160%;
+}
+
+.ten-logo{
+  color: #007881;
+  font-size: 110%;
+}
+
+.ten-logo-athletes{
+  color: #225FBA;
+}
+
+.nav-link{
+  color: #2D2D2D !important;
+}
+
+.nav-link:hover{
+  background-color: #007881;
+  color: white !important;
+}
+
+.active{
+  background-color: #004095 !important;
+}
+
+.viewrankings{
+  font-size: 125%;
+  font-weight: bold;
+}
+
+.sign-in-error-header{
+  color: red;
+  font-size: 100%;
+}

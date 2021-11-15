@@ -1,0 +1,14 @@
+.official-or-not{
+  font-size: 125%;
+}
+
+.sport-search-list{
+}
+
+.rankings-list tbody tr:nth-of-type(odd){
+  background-color: rgb(0,101,255,.07);
+}
+
+.rankings-list tbody tr:nth-of-type(odd):hover{
+  background-color: rgb(0,101,255,.15);
+}

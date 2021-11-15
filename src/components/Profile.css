@@ -1,0 +1,147 @@
+.official-title{
+  font-size: 3.2vh;
+  font-weight: bold;
+}
+
+.official-card{
+  color: #225FBA;
+  text-align: center;
+  font-weight: bolder;
+  font-size: 130%;
+}
+
+.unofficial-card{
+  text-align: center;
+  font-weight: bolder;
+  font-size: 130%;
+}
+
+.initial-card{
+  text-align: center;
+  font-weight: bolder;
+  font-size: 130%;
+}
+
+.sport-name{
+  color: #225FBA;
+}
+
+.unofficial-title{
+  font-size: 3vh;
+  font-weight: bold;
+}
+
+.initial-title{
+  font-size: 3vh;
+  font-weight: bold;
+}
+
+.rating{
+  font-weight: bolder;
+}
+
+.add-sport-title{
+  font-size: x-large;
+}
+
+
+.profile-sport-list-item{
+  cursor: default !important;
+  color: black !important;
+}
+
+.unofficial-explanation{
+  background-color: white;
+  color: black;
+  border: 0px;
+}
+
+.rating{
+  color: #007881;
+}
+
+.table-striped tbody tr:nth-of-type(odd){
+  background-color: rgb(237,237,237,.7);
+}
+
+.table-striped tbody tr:nth-of-type(odd):hover{
+  background-color: rgb(237,237,237,1.5);
+}
+
+.sport-name{
+  text-align: justify;
+}
+
+.accordion-button{
+   border: 0px;
+   background-color: #fff;
+}
+
+.odd > .accordion-button{
+  background-color: inherit;
+}
+
+.odd > .accordion-button:hover{
+  background-color: inherit;
+}
+
+.odd > .accordion-button.collapsed::before{
+  color: black !important;
+  content: '▼ ';
+  font-size: 16px;
+}
+
+.odd > .accordion-button[aria-expanded="true"]::before {
+  color: black !important;
+  content: "▲ ";
+  font-size: 16px;
+}
+
+.even > .accordion-button.collapsed::before{
+  color: black !important;
+  content: '▼ ';
+  font-size: 16px;
+}
+
+.even > .accordion-button[aria-expanded="true"]::before {
+  color: black !important;
+  content: "▲ ";
+  font-size: 16px;
+}
+
+
+
+.athlete-statement{
+  font-size: 3.5vh;
+   color: #007881 !important;
+   font-weight: bolder;
+}
+
+.athlete-statement-words{
+  font-weight: bold;
+}
+
+.accordion-button:focus{
+  outline: none;
+}
+
+.accordion-button.collapsed::before{
+  color: #007881 !important;
+  content: '+ ';
+}
+
+.accordion-button[aria-expanded="true"]::before {
+  color: #007881 !important;
+  content: "- ";
+}
+
+.breakdown{
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.spinner-position{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}

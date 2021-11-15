@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
-import { Button, Form, Container, Row, Col, Card, ListGroup, Popover, OverlayTrigger, CloseButton, Tooltip, Alert, Navbar } from 'react-bootstrap';
+import { Button, Form, Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import styles from './NewEvent.css'
 
 import { config } from './utility/Constants'
@@ -29,11 +29,7 @@ export default class NewEvent extends Component {
       teamRating: 0,
       opponents: [],
       opponentTeamRating: 0,
-      winnerChanged: false,
-      teammateAlert: false,
-      newTeammateName: "",
-      opponentAlert: false,
-      newOpponentName: ""
+      winnerChanged: false
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -206,7 +202,6 @@ export default class NewEvent extends Component {
   }
 
   fillSportName(event){
-    event.preventDefault();
   var rating = 0
   var gamesPlayed = -2
   var error = ""
@@ -363,9 +358,7 @@ export default class NewEvent extends Component {
     this.setState({
       opponent: "",
       opponents,
-      opponentMatches: [],
-      opponentAlert: true,
-      newOpponentName: event.target.attributes[1].value
+      opponentMatches: []
     });
   }
 
@@ -388,9 +381,7 @@ export default class NewEvent extends Component {
     this.setState({
       teammate: "",
       teammates,
-      teammateMatches: [],
-      teammateAlert: true,
-      newTeammateName: event.target.attributes[1].value
+      teammateMatches: []
     });
   }
 
@@ -704,7 +695,6 @@ ratingChange(player){
 
   handleSubmit(event) {
     event.preventDefault();
-
     const { opponentMatches, winner, sportMatches, opponentID, sportID, sports, opponentName, opponentUsername, opponents, teammates, winnerChanged } = this.state
     let oppName = opponentName
     let oppUsername = opponentUsername
@@ -844,10 +834,10 @@ ratingChange(player){
         if(rating !== 0){
           teamRating += rating
           ratedMembers += 1
-          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4', cursor: 'default'}} key={`${teammateOrOpponent}#${i}`}><CloseButton onClick={() => this.removePlayer(i, teammateOrOpponent)} style={{float: "left"}} className="my-0">X</CloseButton><div className="mt-2">{teammate.name}: {rating.toFixed(2)}</div></ListGroup.Item>)
+          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4'}} key={`${teammateOrOpponent}#${i}`}><button onClick={() => this.removePlayer(i, teammateOrOpponent)}>X</button>{teammate.name}: {rating.toFixed(2)}</ListGroup.Item>)
         } else {
           unratedTeammates.push(i)
-          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4', cursor: 'default'}} key={`${teammateOrOpponent}#${i}`}><CloseButton onClick={() => this.removePlayer(i, teammateOrOpponent)} style={{float: "left"}} className="my-0">X</CloseButton><div className="mt-2">{teammate.name}</div></ListGroup.Item>)
+          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4'}} key={`${teammateOrOpponent}#${i}`}><button onClick={() => this.removePlayer(i, teammateOrOpponent)}>X</button>{teammate.name}</ListGroup.Item>)
         }
       });
       if(teammateOrOpponent === 'teammate'){
@@ -857,31 +847,31 @@ ratingChange(player){
           teamRating += this.state.sportMatches[0].rating
           ratedMembers += 1
           rating = this.state.sportMatches[0].rating
-          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4', cursor: 'default'}} key='player'><b>{this.state.user.firstname + ' ' + this.state.user.lastname}: {rating.toFixed(2)}</b></ListGroup.Item>)
+          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4'}} key='player'><b>{this.state.user.firstname + ' ' + this.state.user.lastname}: {rating.toFixed(2)}</b></ListGroup.Item>)
         }
         if(rating === 0) {
-          unratedTeammates.push(team.length)
-          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4', cursor: 'default'}} key='player'><b>{this.state.user.firstname + ' ' + this.state.user.lastname}</b></ListGroup.Item>)
+          unratedTeammates.push(unratedTeammates.length)
+          team.push(<ListGroup.Item action style={{listStyle: 'none', color: '#0046C4'}} key='player'><b>{this.state.user.firstname + ' ' + this.state.user.lastname}</b></ListGroup.Item>)
         }
       }
       if(ratedMembers > 0){
         teamRating = teamRating / ratedMembers
         unratedTeammates.forEach((position) => {
-          // team[position] = <ListGroup.Item action style={{listStyle: 'none'}} key={`${teammateOrOpponent}#${position}`}><Button variant="light" onClick={() => this.removePlayer(position, teammateOrOpponent)}>X</Button>{team[position]}: {teamRating.toFixed(2)}*</ListGroup.Item>
+          team[position] = <ListGroup.Item action style={{listStyle: 'none'}} key={`${teammateOrOpponent}#${position}`}><button onClick={() => this.removePlayer(position, teammateOrOpponent)}>X</button>{team[position]}: {teamRating.toFixed(2)}*</ListGroup.Item>
         });
 
       } else {
         teamRating = homeTeamRating
       }
-      team = [<div style={{float: 'left', paddingLeft: '10%', paddingRight: '10%'}}><h3 style={{textAlign: "center"}} className="pb-3">{teamText}Team: <br/>Average rating: {teamRating.toFixed(2)}</h3>{team}</div>, teamRating]
+      team = [<div style={{float: 'left', paddingLeft: '10%'}}><h3>{teamText}Team: Average rating: {teamRating.toFixed(2)}</h3>{team}</div>, teamRating]
     } else{
       teammates.forEach((teammate, i) => {
-        team.push(<ListGroup.Item action style={{listStyle: 'none', color: "#0046C4", cursor: 'default'}} key={`${teammateOrOpponent}-${i}`}><CloseButton style={{float: "left"}} onClick={() => this.removePlayer(i, teammateOrOpponent)}>X</CloseButton><div className="mt-2">{teammate.name}</div></ListGroup.Item>)
+        team.push(<ListGroup.Item action style={{listStyle: 'none'}} key={`${teammateOrOpponent}-${i}`}><button style={{color: "#0046C4", marginRight: "1vh", border: "1px solid #0046C4"}} onClick={() => this.removePlayer(i, teammateOrOpponent)}>X</button>{teammate.name}</ListGroup.Item>)
       });
       if(teammateOrOpponent === 'teammate'){
-        team.push(<ListGroup.Item className="text-center" action style={{listStyle: 'none', color: "#0046C4", cursor: 'default'}} key={'player'}><b>{this.state.user.firstname} {this.state.user.lastname}</b></ListGroup.Item>)
+        team.push(<ListGroup.Item action style={{listStyle: 'none', color: "#0046C4"}} key={'player'}><b>{this.state.user.firstname} {this.state.user.lastname}</b></ListGroup.Item>)
       }
-      team = [<div style={{float: 'left', paddingLeft: '10%', paddingRight: '10%', color: "#0046C4"}}><h3 className="pb-3">{teamText}Team:</h3>{team}</div>, teamRating]
+      team = [<div style={{float: 'left', paddingLeft: '10%', color: "#0046C4"}}><h3>{teamText}Team:</h3>{team}</div>, teamRating]
     }
     return team
   }
@@ -891,22 +881,6 @@ ratingChange(player){
     let opponentList = []
     let setInitialRating = ""
     let teammateMatchList = []
-    let teamPopover = ""
-    let opponentsPopover = ""
-    let opponentsTrigger = ""
-    let teammatesTrigger = ""
-    let jumpToTeam = ""
-    let jumpToOpponents = ""
-    let teammateAlert = ""
-    let opponentAlert = ""
-    if(this.state.teammateAlert){
-      teammateAlert = <Navbar className="teammate-alert d-block d-sm-none px-auto mb-3">{this.state.newTeammateName} added to your team!</Navbar>
-      setTimeout(() => this.setState({teammateAlert: false, newTeammateName: ""}), 2500)
-    }
-    if(this.state.opponentAlert){
-      opponentAlert = <Navbar className="opponent-alert d-block d-sm-none px-auto mb-3">{this.state.newOpponentName} added to your opponents!</Navbar>
-      setTimeout(() => this.setState({opponentAlert: false, newOpponentName: ""}), 2500)
-    }
     // let sportMatches = this.findSports()
     // let opponentMatches = this.findOpponent()
     let initialRating = false
@@ -982,85 +956,14 @@ ratingChange(player){
     let team = []
     let opponents = []
     let homeTeamRating = 0
-    let numberOfOpponents = ""
-    let numberOfTeammates = "(optional)"
     if(this.state.teammates.length > 0){
       team = this.teammateList(sport, 'teammate', 0)
       homeTeamRating = team.pop()
-      let teammatesForPopover = []
-      this.state.teammates.forEach((person) => {
-        teammatesForPopover.push(<div>{person.name}</div>)
-      });
-
-      teamPopover =
-        <span>
-          {teammatesForPopover}
-        </span>
-      team =
-        <Card className="shadow m-md-5 my-5 p-md-5 py-5">
-          <ListGroup className="text-center">
-            {team[0]}
-            <div className="pb-2 pt-4 errors" id="errors">{this.state.error}</div>
-            <Button onClick={this.handleSubmit} className="mt-3 mx-5 d-block d-md-none text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
-            <a className="mt-3 d-block d-md-none" href="#teammate">Add More</a>
-          </ListGroup>
-        </Card>
-        numberOfTeammates = `▶ (${this.state.teammates.length})`
-        teammatesTrigger = <OverlayTrigger
-          placement="auto"
-          trigger={["hover", "focus"]}
-          overlay={<Tooltip>
-                {teamPopover}
-            </Tooltip>
-
-          }>
-          <Button className="team-list pb-2">
-                {numberOfTeammates}
-          </Button>
-        </OverlayTrigger>
-        jumpToTeam = <span className="d-lg-none">
-                  <a href="#team">Edit</a>
-                </span>
-
-        numberOfTeammates = ""
+      team = team[0]
     }
     if(this.state.opponents.length > 0){
       opponents = this.teammateList(sport, 'opponent', homeTeamRating)
-      let opponentsForPopover = []
-      this.state.opponents.forEach((person) => {
-        opponentsForPopover.push(<div>{person.name}</div>)
-      });
-
-      opponentsPopover =
-        <span>
-          {opponentsForPopover}
-        </span>
-      opponents =
-      <Card className="shadow m-md-5 my-5 p-md-5 py-5">
-        <ListGroup className="text-center">
-          {opponents[0]}
-          <div className="pb-2 pt-4 errors" id="errors">{this.state.error}</div>
-          <Button onClick={this.handleSubmit} className="mt-3 mx-5 d-block d-md-none text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
-          <a className="mt-3 d-block d-md-none" href="#add-opponents">Add More</a>
-        </ListGroup>
-      </Card>
-      numberOfOpponents = `▶ (${this.state.opponents.length})`
-      opponentsTrigger = <OverlayTrigger
-        placement="auto"
-        trigger={["hover", "focus"]}
-        overlay={<Tooltip>
-              {opponentsPopover}
-          </Tooltip>
-
-        }>
-        <Button className="team-list pb-2">
-              {numberOfOpponents}
-        </Button>
-      </OverlayTrigger>
-
-      jumpToOpponents = <span className="d-lg-none">
-                <a href="#opponents">Edit</a>
-              </span>
+      opponents = opponents[0]
     }
 
 // NON-BOOTSTRAP FORM STYLING
@@ -1100,29 +1003,27 @@ ratingChange(player){
 // />
 
     return(
-      <div style={{overflowX: "hidden", height: '100vh', paddingTop: "3%", paddingBottom: "1%", backgroundColor: "#eee"}}>
-      <Container className="d-block d-lg-none pb-3">
-        <Row>
-          <Col>
-          .
-          </Col>
-        </Row>
-      </Container>
-    <Row>
-      <Col id="team" xs="12" md={{order: "first", span: "4"}}>
+    <div style={{backgroundColor: "#EEE", height: '110vh'}}>
+    <br/>
+    <br/>
+    <br/>
+    <div style={{position: 'absolute', width: '25%', paddingLeft: '5%'}}>
+      <ListGroup>
         {team}
-      </Col>
-      <Col id="opponents" md={{span: "4"}} xs={{order: 'last', span: "12"}}>
-        {opponents}
-      </Col>
-
-    <Col xs={{order: 'first', span: "12"}} md={{order: 4, span: "4"}}>
-    <Card className="shadow m-md-5 my-5" >
-    <Form className="pt-4" style={{textAlign: 'center'}} onSubmit={this.handleSubmit}>
+      </ListGroup>
+    </div>
+    <div style={{position: 'absolute', paddingLeft: '70%', width: '25%', paddingRight: '5%'}}>
+    <ListGroup>
+      {opponents}
+    </ListGroup>
+    </div>
     <u>
-    <h2 style={{textAlign: 'center'}}> Submit Results </h2>
+    <h2 style={{textAlign: 'center'}}> Report Results </h2>
     </u>
-      <Row className="mx-3 mt-4">
+    <Card className="shadow" style={{marginLeft: '37.5%', marginRight: '37.5%', width: "25%"}}>
+    <Form className="pt-4" style={{textAlign: 'center'}} onSubmit={this.handleSubmit}>
+
+      <Row className="mx-3">
         <Col xs="12">
         <Form.Group controlID="formSportName">
           <Form.Control
@@ -1151,10 +1052,8 @@ ratingChange(player){
         </Row>
         <Row className="mx-3">
           <Col xs="12">
-          <span id="teammate" className="anchor"></span>
         <Form.Group controlID="formTeammateName">
-        <Form.Label style={{fontSize: "125%"}}>Teammates {numberOfTeammates}{teammatesTrigger} {jumpToTeam}</Form.Label>
-        {teammateAlert}
+        <Form.Label style={{fontSize: "125%"}}>Teammates (optional)</Form.Label>
           <Form.Control
             type="text"
             name="teammate"
@@ -1174,11 +1073,8 @@ ratingChange(player){
         </Row>
         <Row className="mx-3">
           <Col xs="12">
-          <span id="add-opponents" className="anchor"></span>
-
         <Form.Group>
-          <Form.Label style={{fontSize: "125%"}}>Opponents{opponentsTrigger} {jumpToOpponents}</Form.Label>
-          {opponentAlert}
+          <Form.Label style={{fontSize: "125%"}}>Opponents</Form.Label>
           <Form.Control
             type="text"
             name="opponent"
@@ -1208,7 +1104,6 @@ ratingChange(player){
         value="1"
         onClick={this.handleChange}
         required
-        className="mb-2"
       />
 
       <Form.Check
@@ -1217,28 +1112,23 @@ ratingChange(player){
         label='I lost'
         id="I lost"
         value="2"
-        className="mr-md-1"
+        className="mr-1"
         onClick={this.handleChange}
         required
 
       />
     </div>
 
-            <div className="pb-2 errors" id="errors">{this.state.error}</div>
+            {this.state.error}
 
+            <br />
 
-            <Row className="mx-4">
-        <Button className="text-white btn-lg w-100" variant="success" type="submit"><b>Submit</b></Button>
-        </Row>
+        <Button className="text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
+
         <br/>
-        <Alert className="mx-md-3 mt-3 pb-0" variant="success">
-          <p>Only one person should submit results per game</p>
-        </Alert>
         <br/>
       </Form>
       </Card>
-      </Col>
-      </Row>
 
     </div>
   )}

@@ -1,0 +1,57 @@
+.form-group{
+  width: 60%;
+}
+
+.match-winner{
+  font-size: 125%;
+  font-weight: bold;
+}
+
+.form-check-label{
+  cursor: pointer;
+}
+
+.form-check-input{
+  cursor: pointer;
+}
+
+.team-list{
+  background-color: white;
+  color: black;
+  border: 0px;
+}
+
+.team-list:hover{
+  background-color: inherit;
+  color: inherit;
+}
+
+.btn-close{
+  background-color: inherit;
+  border: 0px;
+  color: gray;
+}
+
+.teammate-alert{
+  font-weight: bold;
+  background-color: #d4edda !important;
+  color: #155724 !important;
+}
+
+.opponent-alert{
+  font-weight: bold;
+  background-color: #d4edda !important;
+  color: #155724 !important;
+}
+
+.anchor{
+  height: 60px;
+  display: block;
+  margin-top: -60px;
+  visibility: hidden;
+  z-index: -1000;
+}
+
+.errors{
+  color: red;
+}

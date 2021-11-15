@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import {BrowserView, MobileView} from 'react-device-detect';
 import { config } from './utility/Constants'
+import Background from './bg.jpeg'
+import Logo from './logo.png'
 // import "./Signup.module.css"
 
 let logo = "/logo2.png"
 let bg = "/bg.jpg"
-
 
 class Signup extends Component {
 
@@ -39,83 +41,210 @@ class Signup extends Component {
   render() {
     return (
       <div>
-        <main>
-          <form onSubmit={this.handleSubmit}>
-            <img src={logo} alt="logo" id="logo" width="50" height="50" />
-            <label htmlFor="username">
-              Username
-              <input
-                type="username"
-                id="username"
-                name="username"
-                ref={(node) => {
-                  this.inputNode1 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="firstname">
-              First Name{" "}
-              <input
-                type="text"
-                id="firstname"
-                name="firstname"
-                ref={(node) => {
-                  this.inputNode2 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="firstname">
-              Last Name
-              <input
-                type="text"
-                id="lastname"
-                name="lastname"
-                ref={(node) => {
-                  this.inputNode3 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="email">
-              Email{" "}
-              <input
-                type="email"
-                id="email"
-                name="email"
-                ref={(node) => {
-                  this.inputNode4 = node;
-                }}
-              />
-            </label>
-            <label htmlFor="password">
-              Password
-              <input
-                type="password"
-                id="password"
-                name="password"
-                ref={(node) => {
-                  this.inputNode5 = node;
-                }}
-              />
-            </label>
-            <div id="inlineSlot blueBtn">
-              <label htmlFor="register">
-                {" "}
-                <button id="signin" type="submit">
-                  Register
-                </button>
+      <MobileView>
+      <div style={{float: 'left', width: "50%"}}>
+      <div style={{marginLeft: "10%", marginTop: "15vh", height: '17.5vh', fontFamily: "Copperplate", fontSize: '15vh'}}>
+      10Athletes
+      </div>
+      <div style={{marginLeft: "5%", backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '49.5vh', paddingBottom: '9.5vh'}}>
+      </div>
+      </div>
+      <br/>
+      <br/>
+      <br/>
+        <main >
+          <form align="center" style={{fontSize: 'xx-large'}} onSubmit={this.handleSubmit}>
+          <div align="center" style={{marginLeft: '57.5%', marginRight: '17.5%', backgroundColor: "white", border: "3px solid #435685", width: "25%"}}>
+          <br/><b>Sign Up</b><br/><br/>
+            <div >
+              <label htmlFor="username">
+                <input
+                  style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="username"
+                  id="username"
+                  name="username"
+                  placeholder="   Username"
+                  ref={(node) => {
+                    this.inputNode1 = node;
+                  }}
+                />
+                <br/><br/>
               </label>
-              <a href="/signin">
-                <label id="signinLabel" htmlFor="signin">
+              <label htmlFor="firstname">
+                <input
+                style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="text"
+                  id="firstname"
+                  name="firstname"
+                  placeholder="   First Name"
+                  ref={(node) => {
+                    this.inputNode2 = node;
+                  }}
+                />
+              </label>
+              <br/><br/>
+              <label htmlFor="firstname">
+                <input
+                style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="text"
+                  id="lastname"
+                  name="lastname"
+                  placeholder="   Last Name"
+                  ref={(node) => {
+                    this.inputNode3 = node;
+                  }}
+                />
+              </label>
+              <br/><br/>
+              <label htmlFor="email">
+                <input
+                style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="   Email"
+                  ref={(node) => {
+                    this.inputNode4 = node;
+                  }}
+                />
+              </label>
+              <br/><br/>
+
+              <label htmlFor="password">
+                <input
+                  style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="   Password"
+                  ref={(node) => {
+                    this.inputNode5 = node;
+                  }}
+                />
+              </label>
+              <br/>
+              <br/>
+              <div id="inlineSlot blueBtn" align="center">
+                <label htmlFor="register">
                   {" "}
-                  <button id="register" type="button">
-                    Sign In
+                  <button id="signin" type="submit" style={{color: "white", backgroundColor: "#42B729", width: '40%', height: '3em', fontSize: "large"}}>
+                    <b style={{fontSize: "x-large"}}>Sign Up</b>
                   </button>
-                </label>{" "}
-              </a>
+                  <br/><br/>
+                </label>
+                    {" "}
+                    <span style={{fontSize: "x-large"}}>Already have an account? <a href="/signin">Sign In</a></span><br/><br/>
+
+
+                  {" "}
+              </div>
+            </div>
             </div>
           </form>{" "}
-          <img src={bg} alt="bg" className="run" />
         </main>
+      </MobileView>
+      <BrowserView>
+      <div style={{float: 'left', width: "50%"}}>
+      <div style={{marginLeft: "10%", marginTop: "15vh", height: '17.5vh', fontFamily: "Copperplate", fontSize: '15vh'}}>
+      10Athletes
+      </div>
+      <div style={{marginLeft: "5%", backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '49.5vh', paddingBottom: '9.5vh'}}>
+      </div>
+      </div>
+      <br/>
+      <br/>
+      <br/>
+        <main >
+          <form align="center" style={{fontSize: 'xx-large'}} onSubmit={this.handleSubmit}>
+          <div align="center" style={{marginLeft: '57.5%', marginRight: '17.5%', backgroundColor: "white", border: "3px solid #435685", width: "25%"}}>
+          <br/><b>Sign Up</b><br/><br/>
+            <div >
+              <label htmlFor="username">
+                <input
+                  style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="username"
+                  id="username"
+                  name="username"
+                  placeholder="   Username"
+                  ref={(node) => {
+                    this.inputNode1 = node;
+                  }}
+                />
+                <br/><br/>
+              </label>
+              <label htmlFor="firstname">
+                <input
+                style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="text"
+                  id="firstname"
+                  name="firstname"
+                  placeholder="   First Name"
+                  ref={(node) => {
+                    this.inputNode2 = node;
+                  }}
+                />
+              </label>
+              <br/><br/>
+              <label htmlFor="firstname">
+                <input
+                style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="text"
+                  id="lastname"
+                  name="lastname"
+                  placeholder="   Last Name"
+                  ref={(node) => {
+                    this.inputNode3 = node;
+                  }}
+                />
+              </label>
+              <br/><br/>
+              <label htmlFor="email">
+                <input
+                style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="   Email"
+                  ref={(node) => {
+                    this.inputNode4 = node;
+                  }}
+                />
+              </label>
+              <br/><br/>
+
+              <label htmlFor="password">
+                <input
+                  style={{float: "center", width: '60%', height: '3.5vh', fontSize: 'x-large'}}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="   Password"
+                  ref={(node) => {
+                    this.inputNode5 = node;
+                  }}
+                />
+              </label>
+              <br/>
+              <br/>
+              <div id="inlineSlot blueBtn" align="center">
+                <label htmlFor="register">
+                  {" "}
+                  <button id="signin" type="submit" style={{color: "white", backgroundColor: "#42B729", width: '40%', height: '3em', fontSize: "large"}}>
+                    <b style={{fontSize: "x-large"}}>Sign Up</b>
+                  </button>
+                  <br/><br/>
+                </label>
+                    {" "}
+                    <span style={{fontSize: "x-large"}}>Already have an account? <a href="/signin">Sign In</a></span><br/><br/>
+
+
+                  {" "}
+              </div>
+            </div>
+            </div>
+          </form>{" "}
+        </main>
+        </BrowserView>
       </div>
     );
   }
