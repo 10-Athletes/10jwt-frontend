@@ -188,10 +188,10 @@ class Header extends Component {
       .then(res => res.json()).then(res => (console.log(res.jwt),
       window.localStorage.setItem('jwt', res.jwt)))
       .then(() => {
-        this.props.history.push('/')
+        this.props.history.push('/profile')
         this.setState({ open: false, errors: [] });
       })
-      .catch(setTimeout(() => this.setState({errors: ["Username already in use"]}), 500))
+      .catch(setTimeout(() => this.setState({errors: ["Username already in use"]}), 1500))
     } else {
       this.setState({errors: errorsFound})
     }

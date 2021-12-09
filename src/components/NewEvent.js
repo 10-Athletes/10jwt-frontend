@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
-import { Button, Form, Container, Row, Col, Card, ListGroup, Popover, OverlayTrigger, CloseButton, Tooltip, Alert, Navbar } from 'react-bootstrap';
+import { Button, Form, Modal, ButtonGroup, Container, Row, Col, Card, ListGroup, Table, Popover, OverlayTrigger, CloseButton, Tooltip, Alert, Navbar } from 'react-bootstrap';
 import styles from './NewEvent.css'
 
 import { config } from './utility/Constants'
@@ -33,7 +33,11 @@ export default class NewEvent extends Component {
       teammateAlert: false,
       newTeammateName: "",
       opponentAlert: false,
-      newOpponentName: ""
+      newOpponentName: "",
+      open: false,
+      modalBody: "",
+      modalFooter: "",
+      modalSport: ""
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -41,6 +45,8 @@ export default class NewEvent extends Component {
     this.fillOpponent = this.fillOpponent.bind(this);
     this.fillTeammate = this.fillTeammate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.launchModal = this.launchModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
     this.findSports = this.findSports.bind(this);
     this.removePlayer = this.removePlayer.bind(this);
   }
@@ -239,7 +245,7 @@ export default class NewEvent extends Component {
     backgroundColor: "white",
     currentUserRating: rating,
     currentUserGamesPlayed: gamesPlayed,
-    error: error
+    error: ""
   })
 }
 
@@ -365,7 +371,8 @@ export default class NewEvent extends Component {
       opponents,
       opponentMatches: [],
       opponentAlert: true,
-      newOpponentName: event.target.attributes[1].value
+      newOpponentName: event.target.attributes[1].value,
+      error: ""
     });
   }
 
@@ -390,7 +397,8 @@ export default class NewEvent extends Component {
       teammates,
       teammateMatches: [],
       teammateAlert: true,
-      newTeammateName: event.target.attributes[1].value
+      newTeammateName: event.target.attributes[1].value,
+      error: ""
     });
   }
 
@@ -702,6 +710,235 @@ ratingChange(player){
 
   }
 
+  launchModal(event){
+    event.preventDefault();
+    const { opponentMatches, winner, sportMatches, opponentID, sportID, sports, opponentName, opponentUsername, opponents, teammates, winnerChanged } = this.state
+    let oppName = opponentName
+    let oppUsername = opponentUsername
+    let teammateRatings = []
+    let opponentRatings = []
+    let team1Rating = 0
+    let team2Rating = 0
+    let team1RatedCount = 0
+    let team2RatedCount = 0
+    let assumedRatingAlert=false
+    if((opponentMatches.length > 0 || opponentID !== 0 || opponents.length > 0) && (sportMatches.length > 0 || sportID !== 0)){
+      let actualSportID, p1InitialRating, p2ID, p2InitialRating, sportName
+      if(opponentMatches.length > 0){
+        p2ID = opponentMatches[0].id
+        oppName = opponentMatches[0].name
+        oppUsername = opponentMatches[0].username
+      } else {
+        let p2IDs = []
+        opponents.forEach((opponent) => {
+          p2IDs.push(opponent.id)
+        });
+
+        // p2ID = opponentID
+      }
+      if(sportMatches.length > 0){
+        if(teammates.length > 0){
+          teammates.forEach((player, i) => {
+            teammateRatings[i] = 0
+          });
+        }
+        if(opponents.length > 0){
+          opponents.forEach((player, i) => {
+            opponentRatings[i] = 0
+          });
+        }
+
+        actualSportID = sportMatches[0].id
+        sportName = sportMatches[0].name
+        let ratingSet = false
+        let opponentRatingSet = false
+        sportMatches[0].participants.forEach((participant) => {
+          if(this.state.user.id === participant.id) {
+            p1InitialRating = participant.rating
+            ratingSet = true
+          }
+          teammates.forEach((player, i) => {
+            if(player.id === participant.id){
+              teammateRatings[i] = participant.rating.toFixed(2)
+              team1RatedCount += 1
+              team1Rating += participant.rating
+            }
+          });
+          opponents.forEach((player, i) => {
+            if(player.id === participant.id){
+              opponentRatings[i] = participant.rating.toFixed(2)
+              team2RatedCount += 1
+              team2Rating += participant.rating
+            }
+          });
+        });
+        if (!ratingSet) {
+          p1InitialRating = this.state.initial
+        }
+        team1Rating += p1InitialRating
+        team1Rating = team1Rating / (team1RatedCount + 1)
+        if(team2RatedCount === 0){
+          team2Rating = team1Rating
+        } else {
+          team2Rating = team2Rating / team2RatedCount
+        }
+        teammateRatings.forEach((rating, i) => {
+          if(rating === 0){
+            teammateRatings[i] = team1Rating.toFixed(2) + "*"
+            assumedRatingAlert = true
+          }
+        });
+        opponentRatings.forEach((rating, i) => {
+          if(rating === 0){
+            opponentRatings[i] = team2Rating.toFixed(2) + "*"
+            assumedRatingAlert = true
+          }
+        });
+
+
+      } else {
+        actualSportID = sportID
+        sports.forEach((game) => {
+          if(game.id === sportID) {
+            let ratingSet = false
+            let opponentRatingSet = false
+            game.participants.forEach((participant) => {
+              if(participant.id === this.state.user.id) {
+                p1InitialRating = participant.rating
+                ratingSet = true
+              } else if (participant.id === p2ID) {
+                p2InitialRating = participant.rating
+                opponentRatingSet = true
+              }
+            });
+            if (!ratingSet) {
+              p1InitialRating = this.state.initial
+            }
+            if (!opponentRatingSet) {
+              p2InitialRating = p1InitialRating
+            }
+
+          }
+        });
+
+      }
+      if(p1InitialRating === undefined){
+        this.setState({error: "You need to set an initial skill level."})
+      } else if (!winnerChanged) {
+        this.setState({error: "You need to select a winner."})
+      } else if (opponents.length === 0){
+        this.setState({error: "You need to click on an opponent's name."})
+      }else {
+        // let event =
+        // {
+        //   sport: actualSportID,
+        //   p1ID: this.state.user.id,
+        //   p1Name: this.state.user.firstname + ' ' + this.state.user.lastname,
+        //   p1Username: this.state.user.username,
+        //   p1InitialRating,
+        //   p2ID,
+        //   p2Name: oppName,
+        //   p2Username: oppUsername,
+        //   p2InitialRating,
+        //   sportName,
+        //   opponents,
+        //   teammates
+        // }
+      let event =
+      {
+        sport: actualSportID,
+        p1InitialRating,
+        opponents,
+        teammates,
+        winner
+      }
+
+
+      let yourTeam, opponentTeam, winLoss, atSport
+
+      if(teammates.length > 1){
+        yourTeam = <span>Your Team (<b>You - [{parseFloat(p1InitialRating).toFixed(2)}]</b>, </span>
+      } else if (teammates.length > 0) {
+        yourTeam = <span>Your Team (<b>You - [{parseFloat(p1InitialRating).toFixed(2)}]</b> </span>
+      } else {
+        yourTeam = <span>You - [{parseFloat(p1InitialRating).toFixed(2)}] </span>
+      }
+      let teammateList = []
+      teammates.forEach((player, i) => {
+        let punctuation = ""
+        let and = ""
+        if(i !== teammates.length - 1){
+          punctuation = ", "
+        } else {
+          and = "and "
+          punctuation = ")"
+        }
+        teammateList.push(<span>{and}{player.name} - [{teammateRatings[i]}]{punctuation}</span>)
+      });
+
+      if(winner === "1"){
+        winLoss = <div style={{color: "green"}}><b>WON</b> against</div>
+      } else {
+        winLoss = <div style={{color: "red"}}><b>LOST</b> against</div>
+      }
+
+      let opponentList = []
+      opponents.forEach((player, i) => {
+        let punctuation = ""
+        let and = ""
+        if(i !== opponents.length - 1){
+          punctuation = ", "
+        } else if(i > 0){
+          and = "and "
+        }
+        if(opponents.length === 2){
+          punctuation = ""
+          if(i === 1){
+            and = " and "
+          }
+        }
+
+        opponentList.push(<span>{and}{player.name} - [{opponentRatings[i]}]{punctuation}</span>)
+      });
+
+      atSport = <div> at <b>{sportName}</b>.</div>
+
+      if(assumedRatingAlert){
+        assumedRatingAlert = <Alert variant="danger" className = "mt-3">* Players have not set an initial rating. If you submit now, their rating will be set for them.</Alert>
+      } else {
+        assumedRatingAlert = ""
+      }
+
+      this.setState
+      ({
+        open: true,
+        modalSport: sportName,
+        modalBody:
+          <Modal.Body className="text-center confirm-submission">
+            <span style={{color: "#225FBA"}}>{yourTeam}{teammateList}</span><br/><br/>
+            {winLoss}<br/>
+            {opponentTeam}{opponentList}<br/><br/>
+            {atSport}
+            {assumedRatingAlert}
+            </Modal.Body>,
+          modalFooter:
+            <Modal.Footer style={{borderTop: '0px'}}>
+                <Button size="lg" className="mr-2" onClick={this.closeModal} variant="danger">Modify</Button>
+                <Button size="lg" className="px-3" onClick={() => this.updateCurrentUser(event, 1)} variant="success">Confirm Results</Button>
+            </Modal.Footer>
+      })
+
+    }
+  } else {
+    this.setState({ error: "You need to select a valid opponent and a valid sport."})
+  }
+
+}
+
+closeModal(){
+  this.setState({open: false})
+}
+
   handleSubmit(event) {
     event.preventDefault();
 
@@ -731,14 +968,16 @@ ratingChange(player){
           if(this.state.user.id === participant.id) {
             p1InitialRating = participant.rating
             ratingSet = true
-          } else if (p2ID === participant.id) {
-            p2InitialRating = participant.rating
-            opponentRatingSet = true
           }
+
         });
+
+
         if (!ratingSet) {
           p1InitialRating = this.state.initial
         }
+
+
         if (!opponentRatingSet) {
           p2InitialRating = p1InitialRating
         }
@@ -1000,8 +1239,8 @@ ratingChange(player){
         <Card className="shadow m-md-5 my-5 p-md-5 py-5">
           <ListGroup className="text-center">
             {team[0]}
-            <div className="pb-2 pt-4 errors" id="errors">{this.state.error}</div>
-            <Button onClick={this.handleSubmit} className="mt-3 mx-5 d-block d-md-none text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
+            <div className="pb-2 pt-4 errors d-block d-md-none" id="errors">{this.state.error}</div>
+            <Button onClick={this.launchModal} className="mt-3 mx-5 d-block d-md-none text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
             <a className="mt-3 d-block d-md-none" href="#teammate">Add More</a>
           </ListGroup>
         </Card>
@@ -1039,8 +1278,8 @@ ratingChange(player){
       <Card className="shadow m-md-5 my-5 p-md-5 py-5">
         <ListGroup className="text-center">
           {opponents[0]}
-          <div className="pb-2 pt-4 errors" id="errors">{this.state.error}</div>
-          <Button onClick={this.handleSubmit} className="mt-3 mx-5 d-block d-md-none text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
+          <div className="pb-2 pt-4 errors d-block d-md-none" id="errors">{this.state.error}</div>
+          <Button onClick={this.launchModal} className="mt-3 mx-5 d-block d-md-none text-white btn-lg" variant="success" type="submit"><b>Submit</b></Button>
           <a className="mt-3 d-block d-md-none" href="#add-opponents">Add More</a>
         </ListGroup>
       </Card>
@@ -1115,10 +1354,18 @@ ratingChange(player){
       <Col id="opponents" md={{span: "4"}} xs={{order: 'last', span: "12"}}>
         {opponents}
       </Col>
+      <Modal backdrop="static" centered show={this.state.open} onHide={this.closeModal}>
+          <Modal.Header>
+            <Modal.Title>Confirm {this.state.modalSport} Results</Modal.Title>
+            <CloseButton onClick={this.closeModal}>X</CloseButton>
+          </Modal.Header>
+          {this.state.modalBody}
+          {this.state.modalFooter}
+        </Modal>
 
     <Col xs={{order: 'first', span: "12"}} md={{order: 4, span: "4"}}>
     <Card className="shadow m-md-5 my-5" >
-    <Form className="pt-4" style={{textAlign: 'center'}} onSubmit={this.handleSubmit}>
+    <Form className="pt-4" style={{textAlign: 'center'}} onSubmit={this.launchModal}>
     <u>
     <h2 style={{textAlign: 'center'}}> Submit Results </h2>
     </u>

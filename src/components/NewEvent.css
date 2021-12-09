@@ -38,6 +38,11 @@
   color: #155724 !important;
 }
 
+.confirm-submission{
+  font-weight: bold;
+  font-size: 125%;
+}
+
 .opponent-alert{
   font-weight: bold;
   background-color: #d4edda !important;

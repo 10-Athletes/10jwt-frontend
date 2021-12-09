@@ -178,7 +178,7 @@ export default class Profile extends Component {
               <Table className="pl-0 mx-0" striped hover responsive="sm">
                 <thead>
                   <tr>
-                    <th/>
+                    <th style={{textAlign: "left"}}>Sport</th>
                     <th style={{cursor: 'default'}}>Rating</th>
                   </tr>
                 </thead>
@@ -202,7 +202,7 @@ export default class Profile extends Component {
 
           <Card className="mt-5 unofficial-card shadow" style={{width: '100%'}}>
           <Card.Body>
-            <Card.Title className="unofficial-title ml-5">Unofficial Sports <span>
+            <Card.Title className="unofficial-title ml-5"><span>
             <OverlayTrigger
        trigger={["hover", "focus"]}
        placement="auto"
@@ -215,16 +215,16 @@ export default class Profile extends Component {
          </Popover>
        }
      >
-       <Button className="unofficial-explanation pb-2">?</Button>
+       <span className="unofficial-explanation pb-2">Unofficial Sports</span>
      </OverlayTrigger>
-      </span></Card.Title>
+      </span> </Card.Title>
       <Container className="mx-auto">
         <Row>
         <Col className="pl-0 ml-0" xs="12">
         <Table className="pl-0 ml-0" striped hover responsive="sm">
           <thead>
             <tr>
-              <th/>
+              <th style={{textAlign: "left"}}>Sport</th>
               <th style={{cursor: 'default'}}>Rating</th>
               <OverlayTrigger
                       placement="top"
@@ -270,7 +270,7 @@ export default class Profile extends Component {
               <Table className="pl-0 ml-0" striped hover responsive="sm">
                 <thead>
                   <tr>
-                    <th/>
+                    <th style={{textAlign: "left"}}>Sport</th>
                     <th style={{cursor: 'default'}}>Rating</th>
                     <OverlayTrigger
                             placement="top"

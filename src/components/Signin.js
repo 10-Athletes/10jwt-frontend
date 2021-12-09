@@ -106,8 +106,8 @@ class Signin extends Component {
     // eslint-disable-next-line
     .then(res => res.json()).then(res => (console.log(res.jwt),
     window.localStorage.setItem('jwt', res.jwt)))
-    .then(() => this.props.history.push('/'))
-    .catch(setTimeout(() => this.setState({errors: ["Invalid username or password"]}), 500))
+    .then(() => this.props.history.push('/profile'))
+    .catch(setTimeout(() => this.setState({errors: ["Invalid username or password"]}), 1500))
   }
 
   handleRegisterSubmit = event => {
@@ -137,10 +137,10 @@ class Signin extends Component {
       .then(res => res.json()).then(res => (console.log(res.jwt),
       window.localStorage.setItem('jwt', res.jwt)))
       .then(() => {
-        this.props.history.push('/')
+        this.props.history.push('/profile')
         this.setState({ open: false, errors: [] });
       })
-      .catch(setTimeout(() => this.setState({errors: ["Username already in use"]}), 500))
+      .catch(setTimeout(() => this.setState({errors: ["Username already in use"]}), 1500))
     } else {
       this.setState({errors: errorsFound})
     }
@@ -157,21 +157,23 @@ class Signin extends Component {
         </Col>
           <Col xl="6">
 
-      <div className="d-none d-xl-block text-center" style={{marginTop: "5%", height: '20vh', fontFamily: "boogaloo", fontSize: '15vh'}}>
+      <div className="d-none d-xl-block text-center" style={{height: '20vh', fontFamily: "boogaloo", fontSize: '15vh'}}>
       <span className="ten-logo"><span style={{letterSpacing: "-10px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span>
       </div>
-      <div className="d-block d-xl-none text-center" style={{marginTop: "15%", height: '4vh', fontFamily: "boogaloo", fontSize: '4vh'}}>
-      <span className="ten-logo"><span style={{letterSpacing: "-4px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span>
+      <div className="d-none d-xl-block text-center"><span className="descriptive-tagline-big" style={{height: '7vh', fontSize: '5vh', fontFamily: "boogaloo"}}>Play Sports, Get Ranked</span></div>
+      <div className="d-block d-xl-none text-center pt-5 m-5" style={{height: '4vh', fontFamily: "boogaloo", fontSize: '4vh'}}>
+      <span className="ten-logo"><span style={{letterSpacing: "-4px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span><br/>
+      <span className="descriptive-tagline-small" style={{fontSize: '3.5vh'}}>Play Sports, Get Ranked</span>
       </div>
-      <Card className="border-0 d-none d-xl-block" style={{backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '100%', paddingBottom: '9.5vh'}}>
+      <Card className="border-0 d-none d-xl-block" style={{backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '100%', marginTop: '5vh'}}>
       </Card>
           </Col>
           <Col xl="1">
           </Col>
-          <Col xl="4" className="mt-5 pt-5" xl="3">
+          <Col className="mt-3 mt-xl-5 pt-xl-5" xl="3">
         <div>
         <span className="d-none d-xl-block" style={{marginTop: "15%"}}></span>
-        <Card className="shadow d-xl-block" style={{backgroundColor: "#eee"}}>
+        <Card className="shadow mt-5" style={{backgroundColor: "#eee"}}>
         <Form align="center" style={{fontSize: 'xx-large'}} onSubmit={this.handleSubmit}>
         <Row className="px-3 my-4">
           <Col xs="12">

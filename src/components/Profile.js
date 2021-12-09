@@ -740,7 +740,7 @@ export default class Profile extends Component {
                   sportsList[2].rating / 4
                   + sportsList[0].rating * 0.40
                   + sportsList[3].rating / 4) >
-                  (maxRating[0] + sportsList[3].rating * 0.01)){
+                  (maxRating + sportsList[3].rating * 0.01)){
                   aColor="green"
                   aTextColor="white"
                   defaultKey = "a4"
@@ -786,7 +786,7 @@ export default class Profile extends Component {
                       {(sportsList[1].rating / 4).toFixed(2)} +
                       {(sportsList[2].rating / 4).toFixed(2)} +
                       {(sportsList[3].rating / 4).toFixed(2)} </td>
-                    <td className="align-middle">{(sportsList[1].rating / 4 +
+                    <td style={{backgroundColor: aColor, color: aTextColor}} className="align-middle">{(sportsList[1].rating / 4 +
                       sportsList[2].rating / 4 +
                       sportsList[3].rating / 4
                       + sportsList[0].rating * 0.4).toFixed(2)}</td>
@@ -816,7 +816,7 @@ export default class Profile extends Component {
                   <tr style={{fontWeight: "bold"}}>
                     <td className="align-middle">Total</td>
                     <td className="align-middle">{maxRating.toFixed(2)} + {(sportsList[3].rating*0.01).toFixed(2)}</td>
-                    <td className="align-middle">{(sportsList[3].rating * 0.01 + maxRating).toFixed(2)}</td>
+                    <td className="align-middle" style={{backgroundColor: bColor, color: bTextColor}}>{(sportsList[3].rating * 0.01 + maxRating).toFixed(2)}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -829,14 +829,14 @@ export default class Profile extends Component {
               fourthSport = `You must have another ${4 - sportsList.length} ${official} sport(s) to see this breakdown.`
               fourthSportB = `You must have another ${4 - sportsList.length} ${official} sport(s) to see this breakdown.`
             }
-            if (officialSportsList.length > 4){
-                if (sportsList.length === 5){
+            if (sportsList.length > 4){
+                if (sportsList.length >= 5){
                   if((sportsList[1].rating / 5 +
                     sportsList[2].rating / 5
                     + sportsList[0].rating * 0.40
                     + sportsList[3].rating / 5
                     + sportsList[4].rating / 5) >
-                    (maxRating[0] + sportsList[4].rating * 0.01)){
+                    (maxRating + sportsList[4].rating * 0.01)){
                     aColor="green"
                     aTextColor="white"
                     defaultKey = "a5"
@@ -888,7 +888,7 @@ export default class Profile extends Component {
                       {(sportsList[2].rating / 5).toFixed(2)} +
                       {(sportsList[3].rating / 5).toFixed(2)} +
                       {(sportsList[4].rating / 5).toFixed(2)}</td>
-                    <td className="align-middle">{(sportsList[1].rating / 5 +
+                    <td style={{backgroundColor: aColor, color: aTextColor}} className="align-middle">{(sportsList[1].rating / 5 +
                       sportsList[2].rating / 5 +
                       sportsList[3].rating / 5 +
                       sportsList[4].rating / 5
@@ -919,7 +919,7 @@ export default class Profile extends Component {
                   <tr style={{fontWeight: "bold"}}>
                     <td className="align-middle">Total</td>
                     <td className="align-middle">{maxRating.toFixed(2)} + {(sportsList[4].rating*0.01).toFixed(2)}</td>
-                    <td className="align-middle">{(sportsList[4].rating * 0.01 + maxRating).toFixed(2)}</td>
+                    <td style={{backgroundColor: bColor, color: bTextColor}} className="align-middle">{(sportsList[4].rating * 0.01 + maxRating).toFixed(2)}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -927,22 +927,31 @@ export default class Profile extends Component {
               fifthSport = `You must have another ${5 - sportsList.length} ${official} sport(s) to see this breakdown.`
               fifthSportB = `You must have another ${5 - sportsList.length} ${official} sport(s) to see this breakdown.`
             }
+            let bgColor = ""
+            let color = ""
+            if(sportsList.length === 1){
+              bgColor = "green"
+              color = "white"
+            }
 
-          athlete =       <Accordion flush >
+          athlete =       <Accordion flush>
                             <Accordion.Item eventKey="0">
                               <Row><Accordion.Header className="athlete-Accordion" key={sports[athleteIndex].id}><b><OverlayTrigger
   key="athlete-tooltip"
   placement='top'
   delay={{hide: 300}}
   overlay={
-    <Tooltip size="lg" id={`tooltip-athlete`}>
+    <Tooltip className="d-none d-sm-block" size="lg" id={`tooltip-athlete`}>
       Click to Learn More
     </Tooltip>
   }
-><span className="athlete-statement"><span className="pr-2 athlete-statement-words" style={{color: "#225FBA"}}>Athlete Rating</span> {sports[athleteIndex].rating.toFixed(2)}</span>
+><span className="athlete-statement"><span className="pr-2 athlete-statement-words" style={{color: "#006D75"}}>Athlete Rating</span> {sports[athleteIndex].rating.toFixed(2)}</span>
 </OverlayTrigger></b></Accordion.Header><span></span></Row>
                               <Accordion.Body>
-                                <h4 className="text-center">Your athlete rating is <b>{official}</b>. It is calculated as the highest of the following.</h4>
+                              <span className="athlete-five-highest">Your Athlete Rating is calculated using your 5 highest rated sports.<br/></span>
+                              <Accordion flush><Accordion.Item eventKey="1"><Accordion.Header><span className="athlete-details">Click Here for Details.</span></Accordion.Header>
+                              <Accordion.Body>
+                                <h4>Your athlete rating is <b>{official}</b>. It is the highest of the following:</h4>
                                 <Table striped bordered className="text-center d-none d-md-block">
                                 <thead>
                                   <tr>
@@ -955,13 +964,13 @@ export default class Profile extends Component {
                                               </Tooltip>
                                             }
                                             ><u style={{borderBottom: "1px dotted #000", textDecoration: "none"}}>#</u></OverlayTrigger></th>
-                                    <th></th>
+                                    <th colSpan="2"></th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   <tr>
                                     <td className="align-middle">1</td>
-                                    <td colSpan="2"><b>100% of your top sport's rating.</b></td>
+                                    <td colSpan="2" style={{backgroundColor: bgColor, color: color}}><b>100% of your top sport's rating.</b></td>
                                   </tr>
                                   <tr>
                                     <td className="align-middle">2</td>
@@ -1001,14 +1010,14 @@ export default class Profile extends Component {
                                   </tr>
                                   <tr>
                                     <td className="align-middle">4</td>
-                                    <td><div className="mb-3"><Accordion className="breakdown">
+                                    <td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
                                       <Accordion.Item eventKey="a4">
                                         <Accordion.Header className="even"><span className="breakdown">40% of your top sport's rating + 25% of the other 3.</span></Accordion.Header>
                                           <Accordion.Body>
                                             {fourthSport}
                                           </Accordion.Body>
 </Accordion.Item></Accordion></div></td>
-<td><div className="mb-3"><Accordion className="breakdown">
+<td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
   <Accordion.Item eventKey="b4">
     <Accordion.Header className="even"><span className="breakdown">The highest rating for 3 sports + 1% of 4th highest sport's rating.
 </span></Accordion.Header>
@@ -1019,14 +1028,14 @@ export default class Profile extends Component {
                                   </tr>
                                 <tr>
                                   <td className="align-middle">5</td>
-                                  <td><div className="mb-3"><Accordion className="breakdown">
+                                  <td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
                                     <Accordion.Item eventKey="a5">
                                       <Accordion.Header className="odd"><span className="breakdown">40% of your top sport's rating + 20% of the other 4.</span></Accordion.Header>
                                         <Accordion.Body>
                                           {fifthSport}
                                         </Accordion.Body>
 </Accordion.Item></Accordion></div></td>
-<td><div className="mb-3"><Accordion className="breakdown">
+<td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
   <Accordion.Item eventKey="b5">
     <Accordion.Header className="odd"><span className="breakdown">The highest rating for 4 sports + 1% of 5th highest sport's rating.</span></Accordion.Header>
       <Accordion.Body>
@@ -1037,6 +1046,7 @@ export default class Profile extends Component {
                               </tbody>
 
                               </Table>
+
                               <Table bordered className="text-center d-block d-md-none">
                               <thead>
                                 <tr>
@@ -1054,7 +1064,7 @@ export default class Profile extends Component {
                               <tbody>
                                 <tr>
                                   <td className="align-middle">1</td>
-                                  <td><b>100% of your top sport's rating.</b></td>
+                                  <td style={{backgroundColor: bgColor, color: color}}><b>100% of your top sport's rating.</b></td>
                                 </tr>
                                 <tr>
                                   <td rowSpan="2" className="align-middle">2</td>
@@ -1096,14 +1106,14 @@ export default class Profile extends Component {
                                 </tr>
                                 <tr>
                                   <td rowSpan="2" className="align-middle">4</td>
-                                  <td><div className="mb-3"><Accordion className="breakdown">
+                                  <td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
                                     <Accordion.Item eventKey="a4">
                                       <Accordion.Header className="even"><span className="breakdown">40% of your top sport's rating + 25% of the other 3.</span></Accordion.Header>
                                         <Accordion.Body>
                                           {fourthSport}
                                         </Accordion.Body>
 </Accordion.Item></Accordion></div></td></tr>
-<tr><td><div className="mb-3"><Accordion className="breakdown">
+<tr><td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
 <Accordion.Item eventKey="b4">
   <Accordion.Header className="even"><span className="breakdown">The highest rating for 3 sports + 1% of 4th highest sport's rating.
 </span></Accordion.Header>
@@ -1114,14 +1124,14 @@ export default class Profile extends Component {
                                 </tr>
                               <tr>
                                 <td rowSpan="2" className="align-middle">5</td>
-                                <td><div className="mb-3"><Accordion className="breakdown">
+                                <td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
                                   <Accordion.Item eventKey="a5">
                                     <Accordion.Header className="odd"><span className="breakdown">40% of your top sport's rating + 20% of the other 4.</span></Accordion.Header>
                                       <Accordion.Body>
                                         {fifthSport}
                                       </Accordion.Body>
 </Accordion.Item></Accordion></div></td></tr>
-<tr><td><div className="mb-3"><Accordion className="breakdown">
+<tr><td><div className="mb-3"><Accordion defaultActiveKey={defaultKey} className="breakdown">
 <Accordion.Item eventKey="b5">
   <Accordion.Header className="odd"><span className="breakdown">The highest rating for 4 sports + 1% of 5th highest sport's rating.</span></Accordion.Header>
     <Accordion.Body>
@@ -1132,7 +1142,9 @@ export default class Profile extends Component {
                             </tbody>
 
                             </Table>
-
+                            </Accordion.Body>
+                            </Accordion.Item>
+                            </Accordion>
                               </Accordion.Body>
                             </Accordion.Item>
                           </Accordion>
@@ -1156,7 +1168,7 @@ export default class Profile extends Component {
             <Table className="pl-0 mx-0" striped hover responsive="sm">
               <thead>
                 <tr>
-                  <th/>
+                  <th style={{textAlign: "left"}}>Sport</th>
                   <th style={{cursor: 'default'}}>Rating</th>
                 </tr>
               </thead>
@@ -1177,7 +1189,7 @@ export default class Profile extends Component {
 
         <Card className="mt-5 unofficial-card shadow" style={{width: '100%'}}>
         <Card.Body>
-          <Card.Title className="unofficial-title ml-5">Unofficial Sports <span>
+          <Card.Title className="unofficial-title ml-5"><span>
           <OverlayTrigger
      trigger={["hover", "focus"]}
      placement="auto"
@@ -1190,16 +1202,16 @@ export default class Profile extends Component {
        </Popover>
      }
    >
-     <Button className="unofficial-explanation pb-2">?</Button>
+     <span className="unofficial-explanation pb-2">Unofficial Sports</span>
    </OverlayTrigger>
-    </span></Card.Title>
+    </span> </Card.Title>
     <Container className="mx-auto">
       <Row>
       <Col className="pl-0 ml-0" xs="12">
       <Table className="pl-0 ml-0" striped hover responsive="sm">
         <thead>
           <tr>
-            <th/>
+            <th style={{textAlign: "left"}}>Sport</th>
             <th style={{cursor: 'default'}}>Rating</th>
             <OverlayTrigger
                     placement="top"
@@ -1215,7 +1227,7 @@ export default class Profile extends Component {
                             key="top"
                             overlay={
                               <Tooltip id={`tooltip-top`}>
-                                Game Played
+                                Games Played
                               </Tooltip>
                             }
                             ><th style={{cursor: 'default'}}><u style={{borderBottom: "1px dotted #000", textDecoration: "none"}}>GP</u></th></OverlayTrigger>
@@ -1226,6 +1238,15 @@ export default class Profile extends Component {
       </tbody>
       </Table>
       </Col>
+      </Row>
+      <Row>
+        <Accordion className="w-100 how-to-official" flush defaultActiveKey="0">
+          <Accordion.Item eventKey="0">
+            <Accordion.Body className="text-center">
+              Play 5 games <b>and</b> 5 opponents to earn an official rating
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
       </Row>
       <Row>
         <a href="#add-sport">Add a New Sport</a>
@@ -1245,7 +1266,7 @@ export default class Profile extends Component {
             <Table className="pl-0 ml-0" striped hover responsive="sm">
               <thead>
                 <tr>
-                  <th/>
+                  <th style={{textAlign: "left"}}>Sport</th>
                   <th style={{cursor: 'default'}}>Rating</th>
                   <OverlayTrigger
                           placement="top"
@@ -1261,7 +1282,7 @@ export default class Profile extends Component {
                                   key="top"
                                   overlay={
                                     <Tooltip id={`tooltip-top`}>
-                                      Game Played
+                                      Games Played
                                     </Tooltip>
                                   }
                                   ><th style={{cursor: 'default'}}><u style={{borderBottom: "1px dotted #000", textDecoration: "none"}}>GP</u></th></OverlayTrigger>

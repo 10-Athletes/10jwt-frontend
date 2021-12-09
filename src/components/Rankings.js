@@ -17,10 +17,10 @@ export default class Rankings extends Component {
       sportMatches: [],
       sportID: 10,
       unsetID: 0,
-      official: '2',
+      official: '1',
       error: "",
       searchResultsClass: "d-none",
-      officialChecked: true
+      officialChecked: false
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -244,8 +244,11 @@ export default class Rankings extends Component {
               count = officialCount
             }
             let best = ""
-            if(i === 0){
-              best = <span className="d-none d-sm-block"><br/>Best {sport.wordForPlayer} in the world</span>
+            if(officialCount === 1 && officialOrNot === ""){
+              best = <span className="d-none d-sm-block"><br/>Best {sport.wordForPlayer} in the World</span>
+              if(sport.id === 268){
+                best = <span className="d-none d-sm-block"><br/>Strongest Man in the World</span>
+              }
             }
             participants.push(
               <tr style={{fontWeight: fontWeight}} key={participant.id}>
@@ -303,7 +306,7 @@ export default class Rankings extends Component {
                   value={this.state.sport}
                   onChange={this.handleChange}
                   onFocus={this.showSearchResults}
-                  onBlur={()=> setTimeout(() => this.hideSearchResults(), 1200)}
+                  onBlur={()=> setTimeout(() => this.hideSearchResults(), 1500)}
                   required />
                   <Button type="submit" className="ml-3"  variant="success" onClick={this.handleSubmit}><b>View {nextSport}</b></Button>
 
@@ -321,7 +324,6 @@ export default class Rankings extends Component {
                   value="2"
                   onClick={this.handleChange}
                   className="mb-2"
-                  defaultChecked="checked"
                 />
 
                 <Form.Check
@@ -332,7 +334,7 @@ export default class Rankings extends Component {
                   id="Included"
                   value="1"
                   onClick={this.handleChange}
-
+                  defaultChecked="checked"
                 />
               </div>
             </Col>
