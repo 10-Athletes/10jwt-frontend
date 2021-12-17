@@ -297,7 +297,7 @@ class Signin extends Component {
                     </Col>
                   </Row>
 
-                  <div id="inlineSlot " align="center" className="">
+                  <div id="inlineSlot " align="center" className="test">
                     <Col xs="6">
                       <Button
                         className="mt-3 mb-4 w-100"
