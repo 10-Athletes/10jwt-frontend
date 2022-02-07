@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Navbar, Nav, NavDropdown, Container, Row, Col, Form, Button, Modal, ListGroup, CloseButton} from 'react-bootstrap';
 import jwtDecode from 'jwt-decode'
-import styles from './Header.css'
-
+import Navigation from './Navigation';
 import { config } from './utility/Constants'
+import styles from './Header.css'
 
 class Header extends Component {
   constructor(props) {
@@ -200,6 +201,7 @@ class Header extends Component {
   openModal = () => this.setState({ open: true });
   closeModal = () => this.setState({ open: false });
 
+
   controlledTabs(){
     let key='/'
     let showRankingsLink =
@@ -215,6 +217,7 @@ class Header extends Component {
         key='profile'
       }
       return (
+
         <Navbar collapseOnSelect bg="light" variant="light" expand="lg" className="fixed-top" style={{borderBottom: "1px solid black"}}>
           <Col>
             <Navbar.Brand className="pl-3" href="/"><span className="ten-logo"><span style={{letterSpacing: "-2px"}}>1</span><span style={{letterSpacing: "3px"}}>0</span></span><span className="ten-logo-athletes">Athletes</span></Navbar.Brand>
@@ -250,6 +253,7 @@ class Header extends Component {
     }
 
     return(
+      <>
       <Navbar bg="light" variant="light" expand="lg" className="fixed-top" style={{borderBottom: "1px solid black"}}>
         <Col>
           <Navbar.Brand className="pl-3 mr-5" xs="6" md="12" href="/"><span className="ten-logo"><span style={{letterSpacing: "-2px"}}>1</span><span style={{letterSpacing: "3px"}}>0</span></span><span className="ten-logo-athletes">Athletes</span></Navbar.Brand>
@@ -270,7 +274,7 @@ class Header extends Component {
                     placeholder="  Username or Email"
                     name="username"
                     required
-                  />
+                    />
                 </Col>
                 <Col xs="12" lg="auto">
                   <Form.Control
@@ -280,7 +284,7 @@ class Header extends Component {
                     type="password"
                     name="password"
                     required
-                  />
+                    />
                 </Col>
                 <Col className="mb-3 sign-in-error-header text-center d-block d-lg-none">
                   {this.state.errors[0]}
@@ -314,10 +318,12 @@ class Header extends Component {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
+      
+      </>
     )
   }
-
-
+  
+  
   render(){
     let displayContent = this.controlledTabs()
     let logout = ""

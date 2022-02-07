@@ -8,6 +8,7 @@ import Rankings from './components/Rankings';
 import NewEvent from './components/NewEvent';
 import Header from './components/Header';
 import ViewUser from './components/ViewUser';
+import Navigation from './components/Navigation';
 import jwtDecode from 'jwt-decode'
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -21,7 +22,7 @@ class App extends Component {
     return (
       <div>
         <Router>
-        <Route path='/' component={Header} />
+        <Route path='/' component={Navigation} />
           <div>
             <Route exact path='/signin' component={Signin} />
             <Route exact path='/register' component={Signup} />
@@ -39,7 +40,7 @@ class App extends Component {
     return (
       <div>
         <Router>
-        <Route path='/' component={Header} />
+        <Route path='/' component={Navigation} />
           <div>
             <Route exact path='/signin' component={Signin} />
             <Route exact path='/register' component={Signup} />

@@ -1,25 +1,14 @@
-.official-title{
-  font-size: 3.2vh;
+.initial-title, .official-title{
   font-weight: bold;
 }
 
 .official-card{
   color: #225FBA;
   text-align: center;
-  font-weight: bolder;
-  font-size: 130%;
 }
 
-.unofficial-card{
+.initial-card, .unofficial-card{
   text-align: center;
-  font-weight: bolder;
-  font-size: 130%;
-}
-
-.initial-card{
-  text-align: center;
-  font-weight: bolder;
-  font-size: 130%;
 }
 
 .sport-name{
@@ -29,17 +18,7 @@
 .unofficial-title{
   text-align: left;
   color: #225FBA;
-  font-size: 3vh;
   font-weight: bold;
-}
-
-.initial-title{
-  font-size: 3vh;
-  font-weight: bold;
-}
-
-.add-sport-title{
-  font-size: x-large;
 }
 
 
@@ -53,18 +32,14 @@
   padding-bottom: 1px !important;
 }
 
-.athlete-five-highest{
-  font-size: 3vh;
-}
 
 .athlete-details{
-  font-size: 3vh;
+  
   color: #225FBA !important;
 }
 
 .rating{
   color: #EA7200;
-  font-weight: bolder;
 }
 
 .table-striped tbody tr:nth-of-type(odd){
@@ -127,7 +102,6 @@
 
 
 .athlete-statement{
-  font-size: 3.5vh;
    color: #EA7200 !important;
    font-weight: bolder;
 }
@@ -155,7 +129,6 @@
 }
 
 .breakdown{
-  font-size: 16px;
   font-weight: bold;
 }
 
