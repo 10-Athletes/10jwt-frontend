@@ -11,6 +11,7 @@ class Header extends Component {
     this.state = {
       logout: false,
       open: false,
+      open2: false,
       errors: [],
       validPassword: "false",
       invalidPassword: "false"
@@ -24,6 +25,7 @@ class Header extends Component {
     this.handleSignInClick = this.handleSignInClick.bind(this);
     this.changeBackGround = this.changeBackGround.bind(this);
     this.revertBackGround = this.revertBackGround.bind(this);
+    this.forgotPassword = this.forgotPassword.bind(this)
   }
 
   componentDidMount(){
@@ -197,8 +199,20 @@ class Header extends Component {
     }
 }
 
+  forgotPassword(event){
+    event.preventDefault()
+    let url = config.url.BASE_URL + 'password/reset'
+    var formDataReset = new FormData();
+    formDataReset.append("emailOrUsername", this.inputNode10.value);
+    fetch(url,
+    { method: 'POST', body: formDataReset })
+    this.closeModal2()
+  }
+
   openModal = () => this.setState({ open: true });
   closeModal = () => this.setState({ open: false });
+  openModal2 = () => this.setState({ open2: true });
+  closeModal2 = () => this.setState({ open2: false });
 
   controlledTabs(){
     let key='/'
@@ -308,6 +322,11 @@ class Header extends Component {
                 </Col>
                 <Col xs="auto" className="d-none d-lg-block">
                   <Button variant="success" onClick={this.openModal} className="mb-2">Sign Up</Button>
+                </Col>
+                <Col xs="auto" className="d-lg-block">
+                  <Button variant="link" onClick={this.openModal2} className="w-100 mb-2 px-3">
+                    Forgot Password
+                  </Button>
                 </Col>
               </Row>
             </Form>
@@ -420,6 +439,41 @@ class Header extends Component {
     return(
       <div>
     {displayContent}
+    <Modal backdrop="static" centered show={this.state.open2} onHide={this.closeModal2}>
+      <Modal.Header>
+        <Modal.Title>Forgot Password</Modal.Title>
+        <CloseButton onClick={this.closeModal2}>X</CloseButton>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={this.forgotPassword}>
+          <Row className="pl-3 pr-3 mt-4">
+            <Col xs="12" className="mb-4">
+              <Form.Group>
+                <Form.Control
+                size="lg"
+                type="name"
+                id="emailOrUsernameInput"
+                placeholder="   Username or Email"
+                name="emailorUsername"
+                required
+                ref={(node) => {
+                  this.inputNode10 = node;
+                }}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs="4"></Col>
+            <Col className="mt-4 mb-3 px-3" lg="12" xs="6">
+            <Button size="lg" type="submit" className="w-100" variant="success" onClick={this.forgotPassword}>
+              Forgot Password
+            </Button>
+            </Col>
+          </Row>
+          </Form>
+        </Modal.Body>
+      </Modal>
     <Modal backdrop="static" centered show={this.state.open} onHide={this.closeModal}>
         <Modal.Header>
           <Modal.Title>Sign Up</Modal.Title>

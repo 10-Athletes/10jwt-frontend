@@ -1222,7 +1222,7 @@ closeModal(){
     let opponents = []
     let homeTeamRating = 0
     let numberOfOpponents = ""
-    let numberOfTeammates = "(optional)"
+    let numberOfTeammates = ""
     if(this.state.teammates.length > 0){
       team = this.teammateList(sport, 'teammate', 0)
       homeTeamRating = team.pop()
@@ -1398,38 +1398,15 @@ closeModal(){
         </Row>
         <Row className="mx-3">
           <Col xs="12">
-          <span id="teammate" className="anchor"></span>
-        <Form.Group controlID="formTeammateName">
-        <Form.Label style={{fontSize: "125%"}}>Teammates {numberOfTeammates}{teammatesTrigger} {jumpToTeam}</Form.Label>
-        {teammateAlert}
-          <Form.Control
-            type="text"
-            name="teammate"
-            placeholder="   Teammate Name"
-            value={this.state.teammate}
-            onChange={this.handleChange}
-            minLength='3'
-            size="lg"
-          />
-        </Form.Group>
-        </Col>
-        </Row>
-        <Row className="mx-3 mb-3">
-          <Col xs="12">
-            {teammateMatchList}
-          </Col>
-        </Row>
-        <Row className="mx-3">
-          <Col xs="12">
           <span id="add-opponents" className="anchor"></span>
 
         <Form.Group>
-          <Form.Label style={{fontSize: "125%"}}>Opponents{opponentsTrigger} {jumpToOpponents}</Form.Label>
+          <Form.Label style={{fontSize: "125%"}}>{opponentsTrigger} {jumpToOpponents}</Form.Label>
           {opponentAlert}
           <Form.Control
             type="text"
             name="opponent"
-            placeholder="   Opponent Name"
+            placeholder="   Opponent Name(s)"
             value={this.state.opponent}
             onChange={this.handleChange}
             minLength='3'
@@ -1439,10 +1416,33 @@ closeModal(){
         </Col>
         </Row>
 
-        <Row className="mx-3">
+        <Row className="mx-3 mb-3">
           <Col xs="12">
         <ListGroup className="opponentSearchList" onClick={this.fillOpponent}
         >{opponentList}</ListGroup>
+          </Col>
+        </Row>
+        <Row className="mx-3">
+          <Col xs="12">
+          <span id="teammate" className="anchor"></span>
+        <Form.Group controlID="formTeammateName">
+        <Form.Label style={{fontSize: "125%"}}>{numberOfTeammates}{teammatesTrigger} {jumpToTeam}</Form.Label>
+        {teammateAlert}
+          <Form.Control
+            type="text"
+            name="teammate"
+            placeholder="   (Optional) Teammate Name(s)"
+            value={this.state.teammate}
+            onChange={this.handleChange}
+            minLength='3'
+            size="lg"
+          />
+        </Form.Group>
+        </Col>
+        </Row>
+        <Row className="mx-3">
+          <Col xs="12">
+            {teammateMatchList}
           </Col>
         </Row>
         <br/>
@@ -1478,7 +1478,7 @@ closeModal(){
         <Button className="text-white btn-lg w-100" variant="success" type="submit"><b>Submit</b></Button>
         </Row>
         <br/>
-        <Alert className="mx-md-3 mt-3 pb-0" variant="success">
+        <Alert className="mx-md-3 mt-0 pb-0" variant="success">
           <p>Only one person should submit results per game</p>
         </Alert>
         <br/>

@@ -7,8 +7,13 @@ import Profile from './components/Profile';
 import Rankings from './components/Rankings';
 import NewEvent from './components/NewEvent';
 import Header from './components/Header';
+import Ticker from './components/Ticker';
+import Login from './components/LoginGoogle';
+import Logout from './components/LogoutGoogle';
 import ViewUser from './components/ViewUser';
+import PasswordReset from './components/PasswordReset';
 import jwtDecode from 'jwt-decode'
+import styles from './App.css'
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -19,9 +24,10 @@ class App extends Component {
       let result = jwtDecode(jwt)
       if(result.username){
     return (
-      <div>
+      <div className="app-body">
         <Router>
         <Route path='/' component={Header} />
+        <Route path='/rankings' component={Ticker} />
           <div>
             <Route exact path='/signin' component={Signin} />
             <Route exact path='/register' component={Signup} />
@@ -32,14 +38,16 @@ class App extends Component {
             <Route exact path='/results' component={NewEvent} />
           </div>
         </Router>
+
       </div>
     );
   }
 }else {
     return (
-      <div>
+      <div className="app-body">
         <Router>
         <Route path='/' component={Header} />
+        <Route path='/rankings' component={Ticker} />
           <div>
             <Route exact path='/signin' component={Signin} />
             <Route exact path='/register' component={Signup} />
@@ -47,8 +55,12 @@ class App extends Component {
             <Route exact path='/profile' component={Profile} />
             <Route exact path='/rankings' component={Rankings} />
             <Route exact path='/results' component={NewEvent} />
+            <Route exact path = '/testing' component={Login} />
+            <Route exact path = '/testing' component={Logout} />
+            <Route path = '/password/reset' component={PasswordReset}/>
           </div>
         </Router>
+
       </div>
     );
   }

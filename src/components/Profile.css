@@ -22,6 +22,14 @@
   font-size: 130%;
 }
 
+
+
+.recent-card{
+  text-align: center;
+  font-weight: bolder;
+  font-size: 130%;
+}
+
 .sport-name{
   color: #006D75;
 }
@@ -63,24 +71,28 @@
 }
 
 .rating{
-  color: #EA7200;
+  color: #225FBA;
   font-weight: bolder;
 }
 
 .table-striped tbody tr:nth-of-type(odd){
-  background-color: rgb(245,245,245,.7);
+  background-color: rgb(0,101,255,.07);
 }
 
 .table-striped tbody tr:nth-of-type(odd):hover{
-  background-color: rgb(245,245,245,1.5);
+  background-color: rgb(0,101,255,.15);
+}
+
+.table-striped tbody tr:nth-of-type(even):hover{
+  background-color: rgb(0,101,255,.15);
 }
 
 .opponents-played{
-  color: #225FBA;
+  color: black;
 }
 
 .games-played{
-  color: #225FBA;
+  color: black;
 }
 
 .sport-name{
@@ -102,29 +114,45 @@
 
 .odd > .accordion-button.collapsed::before{
   color: black !important;
-  content: '▼ ';
+  content: ' ';
   font-size: 16px;
 }
 
 .odd > .accordion-button[aria-expanded="true"]::before {
   color: black !important;
-  content: "▲ ";
+  content: "▼ ";
   font-size: 16px;
 }
 
 .even > .accordion-button.collapsed::before{
   color: black !important;
-  content: '▼ ';
+  content: '► ';
   font-size: 16px;
 }
 
 .even > .accordion-button[aria-expanded="true"]::before {
   color: black !important;
-  content: "▲ ";
+  content: "▼ ";
   font-size: 16px;
 }
 
+.sport-individual-games{
+  all: unset;
+}
 
+.sport-individual-games > .accordion-button{
+  background-color: inherit;
+}
+
+.sport-individual-games > .accordion-button.collapsed::before{
+  color: black !important;
+  content: '► ';
+  font-size: 16px;
+}
+
+.sport-individual-games > .accordion-button[aria-expanded="true"]::before {
+  color: black !important;
+}
 
 .athlete-statement{
   font-size: 3.5vh;
@@ -146,12 +174,12 @@
 
 .accordion-button.collapsed::before{
   color: #007881 !important;
-  content: '+ ';
+  content: '► ';
 }
 
 .accordion-button[aria-expanded="true"]::before {
   color: #007881 !important;
-  content: "- ";
+  content: "▼ ";
 }
 
 .breakdown{

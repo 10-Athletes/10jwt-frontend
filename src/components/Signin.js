@@ -14,8 +14,10 @@ class Signin extends Component {
     super(props);
     this.state={
       open: false,
+      open2: false,
       errors: []
     }
+    this.forgotPassword = this.forgotPassword.bind(this)
   }
 
   componentDidMount(){
@@ -95,6 +97,16 @@ class Signin extends Component {
     return errors
   }
 
+  forgotPassword(event){
+    event.preventDefault()
+    let url = config.url.BASE_URL + 'password/reset'
+    var formDataReset = new FormData();
+    formDataReset.append("emailOrUsername", this.inputNode10.value);
+    fetch(url,
+    { method: 'POST', body: formDataReset })
+    this.closeModal2()
+  }
+
   handleSubmit = event => {
     event.preventDefault();
     var formData = new FormData();
@@ -148,6 +160,8 @@ class Signin extends Component {
 
   openModal = () => this.setState({ open: true });
   closeModal = () => this.setState({ open: false });
+  openModal2 = () => this.setState({ open2: true });
+  closeModal2 = () => this.setState({ open2: false });
 
   render() {
     return (
@@ -165,7 +179,7 @@ class Signin extends Component {
       <span className="ten-logo"><span style={{letterSpacing: "-4px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span><br/>
       <span className="descriptive-tagline-small" style={{fontSize: '3.5vh'}}>Play Sports, Get Ranked</span>
       </div>
-      <Card className="border-0 d-none d-xl-block" style={{backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '100%', marginTop: '5vh'}}>
+      <Card className="border-0 d-none d-xl-block" style={{backgroundRepeat: 'no-repeat', backgroundImage: `url(${Background})`, height: '50vh', marginTop: '5vh'}}>
       </Card>
           </Col>
           <Col xl="1">
@@ -228,6 +242,11 @@ class Signin extends Component {
               <b>Sign In</b>
             </Button>
             </Col>
+            <Col>
+            <Button variant="link" size="lg" onClick={this.openModal2}>
+            Forgot Password
+            </Button>
+            </Col>
             <Col className="mb-3 sign-in-error text-center">
               {this.state.errors[0]}
             </Col>
@@ -239,7 +258,41 @@ class Signin extends Component {
               </Col>
             </Row>
           </div>
-
+          <Modal backdrop="static" centered show={this.state.open2} onHide={this.closeModal2}>
+            <Modal.Header>
+              <Modal.Title>Forgot Password</Modal.Title>
+              <CloseButton onClick={this.closeModal2}>X</CloseButton>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={this.forgotPassword}>
+                <Row className="pl-3 pr-3 mt-4">
+                  <Col xs="12" className="mb-4">
+                    <Form.Group>
+                      <Form.Control
+                      size="lg"
+                      type="name"
+                      id="emailOrUsernameInput"
+                      placeholder="   Username or Email"
+                      name="emailorUsername"
+                      required
+                      ref={(node) => {
+                        this.inputNode10 = node;
+                      }}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col xs="4"></Col>
+                  <Col className="mt-4 mb-3 px-3" lg="12" xs="6">
+                  <Button size="lg" type="submit" className="w-100" variant="success" onClick={this.forgotPassword}>
+                    Forgot Password
+                  </Button>
+                  </Col>
+                </Row>
+                </Form>
+              </Modal.Body>
+            </Modal>
           <Modal backdrop="static" centered show={this.state.open} onHide={this.closeModal}>
               <Modal.Header>
                 <Modal.Title>Sign Up</Modal.Title>

@@ -216,7 +216,7 @@ export default class Rankings extends Component {
     let sportsListClassName = this.state.searchResultsClass
     let nextSport = ""
     let sportName = ""
-    let unofficial = this.state.official === '1' ? "Unofficial " : ""
+    let unofficial = this.state.official === '1' ? "*" : ""
     let sportList = []
     if(this.state.sportMatches.length > 0){
       nextSport = this.state.sportMatches[0].name
@@ -245,9 +245,9 @@ export default class Rankings extends Component {
             }
             let best = ""
             if(officialCount === 1 && officialOrNot === ""){
-              best = <span className="d-none d-sm-block"><br/>Best {sport.wordForPlayer} in the World</span>
+              best = <span><br/>Best {sport.wordForPlayer} in the World</span>
               if(sport.id === 268){
-                best = <span className="d-none d-sm-block"><br/>Strongest Man in the World</span>
+                best = <span><br/>Strongest Man in the World</span>
               }
             }
             participants.push(
@@ -330,7 +330,7 @@ export default class Rankings extends Component {
                   inline
                   name="official"
                   type='radio'
-                  label='Unofficial'
+                  label='Unofficial*'
                   id="Included"
                   value="1"
                   onClick={this.handleChange}
@@ -374,7 +374,7 @@ export default class Rankings extends Component {
             <Form.Check
               name="official"
               type='radio'
-              label='Unofficial'
+              label='Unofficial*'
               id="Included"
               value="1"
               onClick={this.handleChange}
@@ -392,7 +392,7 @@ export default class Rankings extends Component {
         </Form>
         </Col>
         <Col xs="12" lg="9" >
-        <h1 style={{textAlign: 'center'}}>{unofficial}{sportName} World Rankings</h1>
+        <h1 style={{textAlign: 'center'}}>{sportName} World Rankings{unofficial}</h1>
         <Table className="rankings-list" bordered striped hover>
           <thead>
             <tr>

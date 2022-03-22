@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import jwtDecode from 'jwt-decode'
 import { config } from './utility/Constants'
-import { Button, Form, Container, Row, Col, Modal, Card, ListGroup, Popover, OverlayTrigger, Tooltip, Table, Accordion } from 'react-bootstrap';
+import { Button, Form, Container, Row, Col, Collapse, Modal, Card, ListGroup, Popover, OverlayTrigger, Tooltip, Table, Accordion } from 'react-bootstrap';
 import styles from './Profile.css'
+import "bootstrap/js/src/collapse.js";
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 
 export default class Profile extends Component {
   constructor(props) {
@@ -17,12 +20,17 @@ export default class Profile extends Component {
     error: "",
     changed: 0,
     username: "",
-    bonusSports: []
+    bonusSports: [],
+    collapsed: [],
+    recentEvents: [],
+    items: Array.from({length: 1}),
+    hasMore: true
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.fillSportName = this.fillSportName.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.fetchMoreData = this.fetchMoreData.bind(this);
   }
 // Configure for allowing viewing other users' profiles
   componentDidMount() {
@@ -40,6 +48,7 @@ export default class Profile extends Component {
         username = result.username
       }
       let url2 = config.url.BASE_URL + 'users/'+result.id
+      let url3 = config.url.BASE_URL + 'users'
 
     // console.log(this.props)
 
@@ -51,16 +60,22 @@ export default class Profile extends Component {
     // .then(() => this.props.history.push('/'))
     // .catch(function(error){console.log('There is an error: ', error.message)})
 
-      Promise.all([fetch(url), fetch(url2)])
+      Promise.all([fetch(url), fetch(url2), fetch(url3)])
       .then(function(responses) {
         return Promise.all(responses.map(function(response) {
           return response.json();
         }));
       }).then(function(data){
         let user = data[1].user
+        let users = data[2].users
         let detail = 0
         let winner = '0'
         let ratingChange = 0
+        let recentEvents
+        if(user.events){
+          recentEvents = user.events.slice(-10000)
+          recentEvents.reverse()
+        }
         if(this.props.location.state){
           detail = this.props.location.state.detail
           winner = this.props.location.state.winner
@@ -78,11 +93,22 @@ export default class Profile extends Component {
             });
           }
         }
-        this.setState({sports: data[0].sports, user, username, changed: detail, winner, ratingChange})
+        this.setState({sports: data[0].sports, user, username, changed: detail, winner, ratingChange, users, recentEvents})
       }.bind(this)).catch(function(error) {
         console.log(error)
       })
     }
+  }
+
+  fetchMoreData(){
+    if(this.state.items.length >= this.state.recentEvents.length / 10){
+      this.setState({hasMore: false})
+    }
+    setTimeout(() => {
+      this.setState({
+        items: this.state.items.concat(Array.from({ length: 1 }))
+      });
+    }, 500);
   }
 
   sortedSportsList(){
@@ -359,6 +385,273 @@ export default class Profile extends Component {
     }
   }
 
+  toggle(i){
+    let arr = this.state.collapsed
+    arr[i] = !this.state.collapsed[i]
+    this.setState({collapsed: arr})
+  }
+
+  recentCardData(){
+    let recentCard = ""
+    let cards = []
+    if(this.state.recentEvents.length > 0){
+      let eventTable = []
+      this.state.recentEvents.forEach((event) => {
+        let sportName = ""
+        this.state.user.sports.forEach((sport) => {
+          if(event.sport == sport.id){
+            sportName = sport.name
+          }
+        });
+
+        let team1 = []
+        let team2 = []
+        this.state.users.forEach((user, k) => {
+          event.team1.forEach((player, l) => {
+            if(user.id === player.id){
+              team1[l] = k
+            }
+          });
+
+          event.team2.forEach((player, l) => {
+            if(user.id === player.id){
+              team2[l] = k
+            }
+          });
+        //
+        });
+
+        let playerTeam = ["team2", -1]
+        let date = ""
+        let changeDirection = ""
+        let changeColor = "green"
+        if(event["created_at"]){
+          date = String(new Date(event.created_at)).split(" ")
+          date = date[1] + " " + date[2] + " '" + date[3][2] + date[3][3]
+
+        }
+        event.team1.forEach((player, j) => {
+          if(player.id === this.state.user.id){
+            playerTeam = ["team1", j]
+          }
+        });
+        if(playerTeam[0] === "team2"){
+          event.team2.forEach((player, j) => {
+            if(player.id === this.state.user.id){
+              playerTeam[1] = j
+            }
+          });
+
+        }
+        let winner
+        if(playerTeam[0] === "team1"){
+          let opponents = this.state.users[team2[0]].firstname + " " + this.state.users[team2[0]].lastname[0]
+          if(event.team2.length > 1){
+            opponents = opponents + "'s Team (" + event.team2InitialRating.toFixed(2) + ")"
+            let oppList = []
+            team2.forEach((i, j) => {
+              let link = "/profile/"
+              link += this.state.users[i].id
+              oppList.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team2[j].initialRating.toFixed(2)}</td></tr>)
+            });
+
+            opponents =
+              <Accordion>
+                <Accordion.Header className="sport-individual-games">{opponents}</Accordion.Header>
+                <Accordion.Body>
+                  <Table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Rating</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {oppList}
+                    </tbody>
+                  </Table>
+                  </Accordion.Body>
+              </Accordion>
+
+          } else {
+            let link = "/profile/" + event.team2[0].id
+            opponents = <span><a href={link}>{opponents}</a> ({event.team2[0].initialRating.toFixed(2)})</span>
+          }
+          let teammates = ""
+          if(event.team1.length > 1){
+            let team = []
+            team1.forEach((i, j) => {
+              if(this.state.users[i].id !== this.state.user.id){
+                let link = "/profile/"
+                link += this.state.users[i].id
+                team.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team1[j].initialRating.toFixed(2)}</td></tr>)
+              }
+            });
+            if(team.length > 1){
+              teammates =
+                <Accordion>
+                  <Accordion.Header> </Accordion.Header>
+                  <Accordion.Body>
+                    <Table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Rating</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {team}
+                      </tbody>
+                    </Table>
+                    </Accordion.Body>
+                </Accordion>
+              }
+              else{
+                teammates = team[0]
+              }
+          }
+          if(event.winner === "1"){
+            winner = this.state.user.firstname + " " + this.state.user.lastname[0] + "'s Team"
+            changeDirection = "+"
+          } else {
+            winner = "User " + event.team2[playerTeam[1]].id + "'s Team"
+            changeColor = "red"
+          }
+
+          eventTable.push(
+            <tr className="profile-sport-list-item">
+              <td className="sport-name">{sportName}</td>
+              <td>{date}</td>
+              <td>{event.team1[playerTeam[1]].initialRating.toFixed(2)}</td>
+              <td style={{color: changeColor}}>{changeDirection + event.team1[playerTeam[1]].ratingChange.toFixed(2)}</td>
+              <td>{opponents}</td>
+              <td>{teammates}</td>
+            </tr>
+          )
+        } else {
+          let opponents = this.state.users[team1[0]].firstname + " " + this.state.users[team1[0]].lastname[0]
+          if(event.team1.length > 1){
+
+            opponents = opponents + "'s Team (" + event.team1InitialRating.toFixed(2) + ")"
+          } else {
+            let link = "/profile/" + event.team1[0].id
+            opponents = <span><a href={link}>{opponents}</a> ({event.team1[0].initialRating.toFixed(2)})</span>
+          }
+          let teammates = ""
+          if(event.team2.length > 1){
+            let team = []
+            team2.forEach((i, j) => {
+              if(this.state.users[i].id !== this.state.user.id){
+                let link = "/profile/"
+                link += this.state.users[i].id
+                team.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team2[j].initialRating.toFixed(2)}</td></tr>)
+              }
+            });
+            if(team.length > 1){
+              teammates =
+                <Accordion>
+                  <Accordion.Header> </Accordion.Header>
+                  <Accordion.Body>
+                    <Table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Rating</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {team}
+                      </tbody>
+                    </Table>
+                    </Accordion.Body>
+                </Accordion>
+              }
+              else{
+                teammates = team[0]
+              }
+          }
+          if(event.winner === "2"){
+            changeDirection = "+"
+            winner = this.state.user.firstname + " " + this.state.user.lastname[0] + "'s Team"
+          } else {
+            winner = "User " + event.team2[playerTeam[1]].id + "'s Team"
+            changeColor = "red"
+          }
+          eventTable.push(
+            <tr className="profile-sport-list-item">
+              <td className="group sport-name">{sportName}</td>
+              <td>{date}</td>
+              <td>{event.team2[playerTeam[1]].initialRating.toFixed(2)}</td>
+              <td style={{color: changeColor}}>{changeDirection + event.team2[playerTeam[1]].ratingChange.toFixed(2)}</td>
+              <td>{opponents}</td>
+              <td>{teammates}</td>
+            </tr>
+
+          )
+        }
+        // <tr>
+        //   <td>{date}</td>
+        //   <td>{event.team2InitialRating.toFixed(2)}</td>
+        //   <td style={{color: changeColor}}>{event.team2[playerTeam[1]].ratingChange.toFixed(2)}</td>
+        //   <td>{"User " + event.team1[playerTeam[1]].id + "'s Team " + event.team2InitialRating.toFixed(2)}</td>
+        //   <td></td>
+        // </tr>
+
+
+      });
+
+      let eventsPerCard = 10
+      let result = eventTable.reduce((resultArray, item, index) => {
+        const cardIndex = Math.floor(index/eventsPerCard)
+
+        if(!resultArray[cardIndex]) {
+          resultArray[cardIndex] = []
+        }
+
+        resultArray[cardIndex].push(item)
+
+        return resultArray
+      }, [])
+      result.forEach((item, i) => {
+        let recentText = ""
+        if(i === 0){
+          recentText = "Recent Games"
+        }
+        cards.push(
+        <Card className="mt-3 recent-card shadow" style={{width: '100%'}}>
+        <Card.Body>
+          <Card.Title className="recent-title ml-5">{recentText}</Card.Title>
+          <Container className="mx-auto w-100">
+            <Row>
+
+            <Col className="px-0 mx-0 w-100" xs="12">
+            <Table className="pl-0 mx-0" striped hover responsive="sm">
+              <thead>
+                <tr>
+                  <th style={{textAlign: "left"}}>Sport</th>
+                  <th>Date</th>
+                  <th style={{cursor: 'default'}}>Rating</th>
+                  <th>Chg</th>
+                  <th>Opponents</th>
+                  <th>Teammates</th>
+                </tr>
+              </thead>
+              <tbody>
+              {item}
+            </tbody>
+            </Table>
+            </Col>
+            </Row>
+            <Row>
+            </Row>
+            </Container>
+          </Card.Body>
+        </Card>
+      )});
+    }
+    return cards
+  }
+
 
   render(){
     let sportsPlayed = []
@@ -387,15 +680,28 @@ export default class Profile extends Component {
     let unofficialIncluded = false
     let unofficialCard = ""
     let athleteIndex = -1
-
+    let recentCard
+    let cards = []
 
 
     if((this.state.user.sports && this.state.user.sports.length > 0) || (this.state.bonusSports && this.state.bonusSports.length > 0)){
       // Get list of sports sorted
       let sports = this.sortedSportsList()
       let officialLength = sports.pop()
+      let events = {}
+      if(this.state.user.events && this.state.user.events.length > 0){
+        this.state.user.events.forEach((event, num) => {
+          cards = this.recentCardData()
 
+          if(events[event.sport]){
+            events[event.sport].push(event)
+          } else{
+            events[event.sport] = [event]
+          }
+        });
 
+      }
+      // console.log(events)
       sports.forEach((sport, i) => {
         let color = 'black'
         let weight = 'normal'
@@ -439,16 +745,236 @@ export default class Profile extends Component {
               }
                 officialIncluded = true
                 officialSportsList.push(sport)
+                let eventTable = []
+                events[sport.id].reverse()
+                events[sport.id].forEach((event, i) => {
+                  let team1 = []
+                  let team2 = []
+                  this.state.users.forEach((user, k) => {
+                    event.team1.forEach((player, l) => {
+                      if(user.id === player.id){
+                        team1[l] = k
+                      }
+                    });
+
+                    event.team2.forEach((player, l) => {
+                      if(user.id === player.id){
+                        team2[l] = k
+                      }
+                    });
+                  //
+                  });
+
+                  let playerTeam = ["team2", -1]
+                  let date = ""
+                  let changeDirection = ""
+                  let changeColor = "green"
+                  if(event["created_at"]){
+                    date = String(new Date(event.created_at)).split(" ")
+                    date = date[1] + " " + date[2] + " '" + date[3][2] + date[3][3]
+
+                  }
+                  event.team1.forEach((player, j) => {
+                    if(player.id === this.state.user.id){
+                      playerTeam = ["team1", j]
+                    }
+                  });
+                  if(playerTeam[0] === "team2"){
+                    event.team2.forEach((player, j) => {
+                      if(player.id === this.state.user.id){
+                        playerTeam[1] = j
+                      }
+                    });
+
+                  }
+                  let winner
+                  if(playerTeam[0] === "team1"){
+                    let opponents = this.state.users[team2[0]].firstname + " " + this.state.users[team2[0]].lastname[0]
+                    if(event.team2.length > 1){
+                      opponents = opponents + "'s Team (" + event.team2InitialRating.toFixed(2) + ")"
+                      let oppList = []
+                      team2.forEach((i, j) => {
+                        let link = "/profile/"
+                        link += this.state.users[i].id
+                        oppList.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team2[j].initialRating.toFixed(2)}</td></tr>)
+                      });
+
+                      opponents =
+                        <Accordion>
+                          <Accordion.Header className="sport-individual-games">{opponents}</Accordion.Header>
+                          <Accordion.Body>
+                            <Table>
+                              <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Rating</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {oppList}
+                              </tbody>
+                            </Table>
+                            </Accordion.Body>
+                        </Accordion>
+
+                    } else {
+                      let link = "/profile/" + event.team2[0].id
+                      opponents = <span><a href={link}>{opponents}</a> ({event.team2[0].initialRating.toFixed(2)})</span>
+                    }
+                    let teammates = ""
+                    if(event.team1.length > 1){
+                      let team = []
+                      team1.forEach((i, j) => {
+                        if(this.state.users[i].id !== this.state.user.id){
+                          let link = "/profile/"
+                          link += this.state.users[i].id
+                          team.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team1[j].initialRating.toFixed(2)}</td></tr>)
+                        }
+                      });
+                      if(team.length > 1){
+                        teammates =
+                          <Accordion>
+                            <Accordion.Header> </Accordion.Header>
+                            <Accordion.Body>
+                              <Table>
+                                <thead>
+                                  <tr>
+                                    <th>Name</th>
+                                    <th>Rating</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {team}
+                                </tbody>
+                              </Table>
+                              </Accordion.Body>
+                          </Accordion>
+                        }
+                        else{
+                          teammates = team[0]
+                        }
+                    }
+                    if(event.winner === "1"){
+                      winner = this.state.user.firstname + " " + this.state.user.lastname[0] + "'s Team"
+                      changeDirection = "+"
+                    } else {
+                      winner = "User " + event.team2[playerTeam[1]].id + "'s Team"
+                      changeColor = "red"
+                    }
+
+
+                    eventTable.push(
+                      <tr>
+                        <td>{date}</td>
+                        <td>{event.team1[playerTeam[1]].initialRating.toFixed(2)}</td>
+                        <td style={{color: changeColor}}>{changeDirection + event.team1[playerTeam[1]].ratingChange.toFixed(2)}</td>
+                        <td>{opponents}</td>
+                        <td>{teammates}</td>
+                      </tr>
+                    )
+                  } else {
+                    let opponents = this.state.users[team1[0]].firstname + " " + this.state.users[team1[0]].lastname[0]
+                    if(event.team1.length > 1){
+
+                      opponents = opponents + "'s Team (" + event.team1InitialRating.toFixed(2) + ")"
+                    } else {
+                      let link = "/profile/" + event.team1[0].id
+                      opponents = <span><a href={link}>{opponents}</a> ({event.team1[0].initialRating.toFixed(2)})</span>
+                    }
+                    let teammates = ""
+                    if(event.team2.length > 1){
+                      let team = []
+                      team2.forEach((i, j) => {
+                        if(this.state.users[i].id !== this.state.user.id){
+                          let link = "/profile/"
+                          link += this.state.users[i].id
+                          team.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team2[j].initialRating.toFixed(2)}</td></tr>)
+                        }
+                      });
+                      if(team.length > 1){
+                        teammates =
+                          <Accordion>
+                            <Accordion.Header> </Accordion.Header>
+                            <Accordion.Body>
+                              <Table>
+                                <thead>
+                                  <tr>
+                                    <th>Name</th>
+                                    <th>Rating</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {team}
+                                </tbody>
+                              </Table>
+                              </Accordion.Body>
+                          </Accordion>
+                        }
+                        else{
+                          teammates = team[0]
+                        }
+                    }
+                    if(event.winner === "2"){
+                      winner = this.state.user.firstname + " " + this.state.user.lastname[0] + "'s Team"
+                      changeDirection = "+"
+                    } else {
+                      winner = "User " + event.team2[playerTeam[1]].id + "'s Team"
+                      changeColor = "red"
+                    }
+                    eventTable.push(
+                      <tr>
+                        <td>{date}</td>
+                        <td>{event.team2[playerTeam[1]].initialRating.toFixed(2)}</td>
+                        <td style={{color: changeColor}}>{changeDirection + event.team2[playerTeam[1]].ratingChange.toFixed(2)}</td>
+                        <td>{opponents}</td>
+                        <td>{teammates}</td>
+                      </tr>
+
+                    )
+                  }
+                  // <tr>
+                  //   <td>{date}</td>
+                  //   <td>{event.team2InitialRating.toFixed(2)}</td>
+                  //   <td style={{color: changeColor}}>{event.team2[playerTeam[1]].ratingChange.toFixed(2)}</td>
+                  //   <td>{"User " + event.team1[playerTeam[1]].id + "'s Team " + event.team2InitialRating.toFixed(2)}</td>
+                  //   <td></td>
+                  // </tr>
+                });
+
+                let collapseChar = '►'
+                if(this.state.collapsed[i]){
+                  collapseChar = '▼'
+                }
                 officialSportPlayed.push(
                     <tr style={{backgroundColor: variant}} className="profile-sport-list-item">
-                      <td style={{cursor: 'default'}} className="group sport-name">{sport.name}</td>
+                      <td onClick={() => this.toggle(i)} style={{cursor: 'default', width: '100%', whiteSpace: "nowrap"}} className="group sport-name"><span className="pr-2 pr-sm-3">{collapseChar}</span> {sport.name}</td>
 
-                      <td className="group rating">{`${sport.rating.toFixed(2)}`} {ratingChange}</td>
-                      <td className="group opponents-played">{sport.opponents.length}</td>
-                      <td className="group games-played">{sport.numGames}</td>
-
-
+                      <td onClick={() => this.toggle(i)} className="group rating">{`${sport.rating.toFixed(2)}`} {ratingChange}</td>
+                      <td onClick={() => this.toggle(i)} className="group opponents-played">{sport.opponents.length}</td>
+                      <td onClick={() => this.toggle(i)} className="group games-played">{sport.numGames}</td>
                     </tr>
+
+                )
+                officialSportPlayed.push(
+
+                    <td colSpan="4" className="py-0 my-0" style={{height: '0px'}}>
+                  <Collapse in={this.state.collapsed[i]} className="w-100">
+                    <Table striped>
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Rating</th>
+                          <th>Chg</th>
+                          <th>Opponents</th>
+                          <th>Teammates</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {eventTable}
+                      </tbody>
+                    </Table>
+                  </Collapse>
+                  </td>
                 )
                 sportsPlayed.push(
                   <div
@@ -479,15 +1005,234 @@ export default class Profile extends Component {
                 if(games > 0){
                   unofficialIncluded = true
                   unofficialSportsList.push(sport)
-                    unofficialSportPlayed.push(
-                        <tr style={{backgroundColor: variant}} className="profile-sport-list-item">
-                        <td style={{cursor: 'default'}} className="group sport-name">{sport.name}</td>
+                  let eventTable = []
+                  events[sport.id].reverse()
+                  events[sport.id].forEach((event, i) => {
+                    let team1 = []
+                    let team2 = []
+                    this.state.users.forEach((user, k) => {
+                      event.team1.forEach((player, l) => {
+                        if(user.id === player.id){
+                          team1[l] = k
+                        }
+                      });
 
+                      event.team2.forEach((player, l) => {
+                        if(user.id === player.id){
+                          team2[l] = k
+                        }
+                      });
+                    //
+                    });
+
+                    let playerTeam = ["team2", -1]
+                    let date = ""
+                    let changeDirection = ""
+                    let changeColor = "green"
+                    if(event["created_at"]){
+                      date = String(new Date(event.created_at)).split(" ")
+                      date = date[1] + " " + date[2] + " '" + date[3][2] + date[3][3]
+
+                    }
+                    event.team1.forEach((player, j) => {
+                      if(player.id === this.state.user.id){
+                        playerTeam = ["team1", j]
+                      }
+                    });
+                    if(playerTeam[0] === "team2"){
+                      event.team2.forEach((player, j) => {
+                        if(player.id === this.state.user.id){
+                          playerTeam[1] = j
+                        }
+                      });
+
+                    }
+                    let winner
+                    if(playerTeam[0] === "team1"){
+                      let opponents = this.state.users[team2[0]].firstname + " " + this.state.users[team2[0]].lastname[0]
+                      if(event.team2.length > 1){
+                        opponents = opponents + "'s Team (" + event.team2InitialRating.toFixed(2) + ")"
+                        let oppList = []
+                        team2.forEach((i, j) => {
+                          let link = "/profile/"
+                          link += this.state.users[i].id
+                          oppList.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team2[j].initialRating.toFixed(2)}</td></tr>)
+                        });
+
+                        opponents =
+                          <Accordion>
+                            <Accordion.Header className="sport-individual-games">{opponents}</Accordion.Header>
+                            <Accordion.Body>
+                              <Table>
+                                <thead>
+                                  <tr>
+                                    <th>Name</th>
+                                    <th>Rating</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {oppList}
+                                </tbody>
+                              </Table>
+                              </Accordion.Body>
+                          </Accordion>
+
+                      } else {
+                        let link = "/profile/" + event.team2[0].id
+                        opponents = <span><a href={link}>{opponents}</a> ({event.team2[0].initialRating.toFixed(2)})</span>
+                      }
+                      let teammates = ""
+                      if(event.team1.length > 1){
+                        let team = []
+                        team1.forEach((i, j) => {
+                          if(this.state.users[i].id !== this.state.user.id){
+                            let link = "/profile/"
+                            link += this.state.users[i].id
+                            team.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team1[j].initialRating.toFixed(2)}</td></tr>)
+                          }
+                        });
+                        if(team.length > 1){
+                          teammates =
+                            <Accordion>
+                              <Accordion.Header> </Accordion.Header>
+                              <Accordion.Body>
+                                <Table>
+                                  <thead>
+                                    <tr>
+                                      <th>Name</th>
+                                      <th>Rating</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {team}
+                                  </tbody>
+                                </Table>
+                                </Accordion.Body>
+                            </Accordion>
+                          }
+                          else{
+                            teammates = team[0]
+                          }
+                      }
+                      if(event.winner === "1"){
+                        winner = this.state.user.firstname + " " + this.state.user.lastname[0] + "'s Team"
+                        changeDirection = "+"
+                      } else {
+                        winner = "User " + event.team2[playerTeam[1]].id + "'s Team"
+                        changeColor = "red"
+                      }
+
+
+                      eventTable.push(
+                        <tr>
+                          <td>{date}</td>
+                          <td>{event.team1[playerTeam[1]].initialRating.toFixed(2)}</td>
+                          <td style={{color: changeColor}}>{changeDirection + event.team1[playerTeam[1]].ratingChange.toFixed(2)}</td>
+                          <td>{opponents}</td>
+                          <td>{teammates}</td>
+                        </tr>
+                      )
+                    } else {
+                      let opponents = this.state.users[team1[0]].firstname + " " + this.state.users[team1[0]].lastname[0]
+                      if(event.team1.length > 1){
+
+                        opponents = opponents + "'s Team (" + event.team1InitialRating.toFixed(2) + ")"
+                      } else {
+                        let link = "/profile/" + event.team1[0].id
+                        opponents = <span><a href={link}>{opponents}</a> ({event.team1[0].initialRating.toFixed(2)})</span>
+                      }
+                      let teammates = ""
+                      if(event.team2.length > 1){
+                        let team = []
+                        team2.forEach((i, j) => {
+                          if(this.state.users[i].id !== this.state.user.id){
+                            let link = "/profile/"
+                            link += this.state.users[i].id
+                            team.push(<tr><td><a href={link}>{this.state.users[i].firstname + " " + this.state.users[i].lastname[0]}</a></td><td>{event.team2[j].initialRating.toFixed(2)}</td></tr>)
+                          }
+                        });
+                        if(team.length > 1){
+                          teammates =
+                            <Accordion>
+                              <Accordion.Header> </Accordion.Header>
+                              <Accordion.Body>
+                                <Table>
+                                  <thead>
+                                    <tr>
+                                      <th>Name</th>
+                                      <th>Rating</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {team}
+                                  </tbody>
+                                </Table>
+                                </Accordion.Body>
+                            </Accordion>
+                          }
+                          else{
+                            teammates = team[0]
+                          }
+                      }
+                      if(event.winner === "2"){
+                        winner = this.state.user.firstname + " " + this.state.user.lastname[0] + "'s Team"
+                        changeDirection = "+"
+                      } else {
+                        winner = "User " + event.team2[playerTeam[1]].id + "'s Team"
+                        changeColor = "red"
+                      }
+                      eventTable.push(
+                        <tr>
+                          <td>{date}</td>
+                          <td>{event.team2[playerTeam[1]].initialRating.toFixed(2)}</td>
+                          <td style={{color: changeColor}}>{changeDirection + event.team2[playerTeam[1]].ratingChange.toFixed(2)}</td>
+                          <td>{opponents}</td>
+                          <td>{teammates}</td>
+                        </tr>
+
+                      )
+                    }
+                    // <tr>
+                    //   <td>{date}</td>
+                    //   <td>{event.team2InitialRating.toFixed(2)}</td>
+                    //   <td style={{color: changeColor}}>{event.team2[playerTeam[1]].ratingChange.toFixed(2)}</td>
+                    //   <td>{"User " + event.team1[playerTeam[1]].id + "'s Team " + event.team2InitialRating.toFixed(2)}</td>
+                    //   <td></td>
+                    // </tr>
+                  });
+
+                  let collapseChar = '►'
+                  if(this.state.collapsed[i]){
+                    collapseChar = '▼'
+                  }
+                    unofficialSportPlayed.push(
+                        <tr onClick={() => this.toggle(i)} style={{backgroundColor: variant}} className="profile-sport-list-item">
+                        <td style={{cursor: 'default', width: '100%', whiteSpace: "nowrap"}} className="group sport-name"><span className="pr-2 pr-sm-3">{collapseChar}</span> {sport.name}</td>
                           <td className="group rating">{`${sport.rating.toFixed(2)}`} {ratingChange}</td>
                           <td className="group opponents-played">{sport.opponents.length}</td>
                           <td className="group games-played">{sport.numGames}</td>
-
                         </tr>
+                    )
+                    unofficialSportPlayed.push(
+
+                        <td colSpan="4" className="py-0 my-0" style={{height: '0px'}}>
+                      <Collapse in={this.state.collapsed[i]} className="w-100">
+                        <Table striped>
+                          <thead>
+                            <tr>
+                              <th>Date</th>
+                              <th>Rating</th>
+                              <th>Chg</th>
+                              <th>Opponents</th>
+                              <th>Teammates</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {eventTable}
+                          </tbody>
+                        </Table>
+                      </Collapse>
+                      </td>
                     )
                   }
                  else {
@@ -519,7 +1264,7 @@ export default class Profile extends Component {
                 } else {
                   if(!anyUnplayed){
                     anyUnplayed = true
-                    sportsPlayed.push(<div><br/><span style={{fontSize: "3vh"}} key="initial"><br/><b>Initial Rating Only</b></span><br/><br/></div>)
+                    sportsPlayed.push(<div><br/><span style={{fontSize: "3vh"}} key="initial"><br/><b>Initial Rating (no games played)</b></span><br/><br/></div>)
                     sOrNot = s
                   }
                   text = <div>{sport.name}: {sport.rating.toFixed(2)}{officialOrNot} {ratingChange}</div>
@@ -949,7 +1694,7 @@ export default class Profile extends Component {
 </OverlayTrigger></b></Accordion.Header><span></span></Row>
                               <Accordion.Body>
                               <span className="athlete-five-highest">Your Athlete Rating is calculated using your 5 highest rated sports.<br/></span>
-                              <Accordion flush><Accordion.Item eventKey="1"><Accordion.Header><span className="athlete-details">Click Here for Details.</span></Accordion.Header>
+                              <Accordion className="test-this" flush><Accordion.Item eventKey="1"><Accordion.Header><span className="athlete-details">Click Here for Details.</span></Accordion.Header>
                               <Accordion.Body>
                                 <h4>Your athlete rating is <b>{official}</b>. It is the highest of the following:</h4>
                                 <Table striped bordered className="text-center d-none d-md-block">
@@ -1158,9 +1903,9 @@ export default class Profile extends Component {
 
     if (onlyInitialIncluded){
       initialCard =
-        <Card className="mt-5 initial-card shadow" style={{width: '100%'}}>
+        <Card className="mt-3 initial-card shadow" style={{width: '100%'}}>
         <Card.Body>
-          <Card.Title className="initial-title ml-5">Initial Rating Only</Card.Title>
+          <Card.Title className="initial-title ml-5">Initial Rating (no games played)</Card.Title>
           <Container className="mx-auto w-100">
             <Row>
 
@@ -1187,31 +1932,24 @@ export default class Profile extends Component {
     if(unofficialIncluded){
       unofficialCard =
 
-        <Card className="mt-5 unofficial-card shadow" style={{width: '100%'}}>
+        <Card className="mt-3 unofficial-card shadow" style={{width: '100%'}}>
         <Card.Body>
-          <Card.Title className="unofficial-title ml-5"><span>
-          <OverlayTrigger
-     trigger={["hover", "focus"]}
-     placement="auto"
-     overlay={
-       <Popover style={{width: '120%'}}>
-         <Popover.Header as="h3" style={{textAlign: "center"}}>Unofficial Sports*</Popover.Header>
-         <Popover.Body>
-         Sports are unofficial until you have played at least five opponents <b>AND</b> at least five games.
-         </Popover.Body>
-       </Popover>
-     }
-   >
-     <span className="unofficial-explanation pb-2">Unofficial Sports</span>
-   </OverlayTrigger>
-    </span> </Card.Title>
-    <Container className="mx-auto">
+    <Container className="mx-0 px-0 mx-sm-auto">
+    <Row className="pb-3">
+      <Accordion className="w-100 how-to-official" flush defaultActiveKey="0">
+        <Accordion.Item eventKey="0">
+          <Accordion.Body className="text-center">
+            Play 5 games <b>and</b> 5 opponents to earn an official rating
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+    </Row>
       <Row>
       <Col className="pl-0 ml-0" xs="12">
       <Table className="pl-0 ml-0" striped hover responsive="sm">
         <thead>
           <tr>
-            <th style={{textAlign: "left"}}>Sport</th>
+            <th className="pl-5" style={{textAlign: "left"}}>Sport</th>
             <th style={{cursor: 'default'}}>Rating</th>
             <OverlayTrigger
                     placement="top"
@@ -1239,15 +1977,7 @@ export default class Profile extends Component {
       </Table>
       </Col>
       </Row>
-      <Row>
-        <Accordion className="w-100 how-to-official" flush defaultActiveKey="0">
-          <Accordion.Item eventKey="0">
-            <Accordion.Body className="text-center">
-              Play 5 games <b>and</b> 5 opponents to earn an official rating
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-      </Row>
+
       <Row>
         <a href="#add-sport">Add a New Sport</a>
       </Row>
@@ -1257,16 +1987,16 @@ export default class Profile extends Component {
     }
     if(officialIncluded){
       officialCard =
-        <Card className="mt-5 official-card shadow w-100" >
+        <Card className="mt-3 official-card shadow w-100" >
         <Card.Body>
           <Card.Title style={{textAlign: "left"}} className="official-title ml-5">Ranked Sports</Card.Title>
-          <Container className="mx-auto">
+          <Container className="mx-0 px-0 mx-sm-auto">
             <Row>
             <Col className="pl-0 mx-0" xs="12">
             <Table className="pl-0 ml-0" striped hover responsive="sm">
               <thead>
                 <tr>
-                  <th style={{textAlign: "left"}}>Sport</th>
+                  <th className="pl-5" style={{textAlign: "left"}}>Sport</th>
                   <th style={{cursor: 'default'}}>Rating</th>
                   <OverlayTrigger
                           placement="top"
@@ -1337,10 +2067,11 @@ export default class Profile extends Component {
             <Col xs="12" md="9" className="px-0 mx-md-auto">
               {initialCard}
             </Col>
+            <span id="add-sport" className="jump-to-add"></span>
           </Row>
           <Row style={{width: '100vw'}}>
           <Col xs="12" md="9" className="px-0 mx-md-auto">
-          <Card style={{width: '100%'}} id="add-sport" className="mt-5 add-sport shadow">
+          <Card style={{width: '100%'}} className="mt-3 add-sport shadow">
             <Card.Body>
               <Card.Title className="add-sport-title ml-md-5 mb-4">Pick a sport that you want to play and set your initial rating out of 10</Card.Title>
               <Form onSubmit={this.handleSubmit}>
@@ -1395,7 +2126,24 @@ export default class Profile extends Component {
           </Card>
           </Col>
           </Row>
+          <Row style={{width: '100vw'}}>
+            <Col xs="12" md="9" className="px-0 mx-md-auto">
+              {<InfiniteScroll
+        dataLength={this.state.items.length}
+        next={this.fetchMoreData}
+        hasMore={this.state.hasMore}
+        loader={<h4>Loading...</h4>}
+      >
+        {this.state.items.map((i, index) => (
+          <div key={index}>
+            {cards[index]}
+          </div>
+        ))}
+      </InfiniteScroll>}
+            </Col>
+          </Row>
           </Container>
+
 
 
       </div>
