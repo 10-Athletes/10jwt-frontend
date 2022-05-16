@@ -5,6 +5,7 @@ import { Button, Form, Container, Row, Col, Collapse, Modal, Card, ListGroup, Po
 import styles from './Profile.css'
 import "bootstrap/js/src/collapse.js";
 import InfiniteScroll from 'react-infinite-scroll-component';
+import ContactInfo from './ContactInfo'
 
 
 export default class Profile extends Component {
@@ -24,13 +25,16 @@ export default class Profile extends Component {
     collapsed: [],
     recentEvents: [],
     items: Array.from({length: 1}),
-    hasMore: true
+    hasMore: true,
+    updated: 0
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.fillSportName = this.fillSportName.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.fetchMoreData = this.fetchMoreData.bind(this);
+    this.contactUpdated = this.contactUpdated.bind(this);
+    this.updateContact = this.updateContact.bind(this);
   }
 // Configure for allowing viewing other users' profiles
   componentDidMount() {
@@ -652,6 +656,44 @@ export default class Profile extends Component {
     return cards
   }
 
+  getAge(){
+    var today = new Date()
+    if(this.state.user.contact[0]["age"] && this.state.user.contact[0]["age"] !== ""){
+      var birthDate = this.state.user.contact[0]["age"]
+      var age = today.getFullYear() - birthDate["year"]
+      var m = today.getMonth() - birthDate["month"]
+      if(m < 0 || (m === 0 && today.getDate() < birthDate["day"])){
+        age--
+      }
+      if((this.state.user.contact[0]["gender"] && this.state.user.contact[0]["gender"] !== "Prefer Not to Answer") || this.state.user.contact[0]["location"]){
+        return <span>{age} /</span>
+      } else {
+        return <span>{age}<br/></span>
+      }
+    }
+    return ""
+  }
+
+  updateContact(){
+    // this.setState({collapsed: false})
+  }
+
+  contactUpdated(updatedContact){
+    let contact = {}
+    let user = this.state.user
+    // if(this.state.user.contact && this.state.user.contact[0]){
+        contact["email"] = updatedContact["email"]
+        contact["location"] = updatedContact["location"]
+        contact["age"] = updatedContact["age"]
+        contact["availability"] = updatedContact["availability"]
+        contact["gender"] = updatedContact["gender"]
+        contact["other"] = updatedContact["other"]
+        contact["phoneNumber"] = updatedContact["phoneNumber"]
+    // }
+    // console.log(updatedContact)
+    user.contact[0] = contact
+    this.setState({user})
+  }
 
   render(){
     let sportsPlayed = []
@@ -681,9 +723,62 @@ export default class Profile extends Component {
     let unofficialCard = ""
     let athleteIndex = -1
     let recentCard
+    let contact = {}
     let cards = []
+    let mySports = "My Sports"
+    let contactLineCount = 0
 
-
+    if(this.state.user.contact && this.state.user.contact[0]){
+      let phoneLink = "sms:" + this.state.user.contact[0]["phoneNumber"]
+      let mailLink = "mailto:" + this.state.user.contact[0]["email"]
+      contact["age"] = this.getAge()
+      if(contact["age"].length > 0){
+        contactLineCount = 1
+      }
+      if(this.state.user.contact[0]["gender"] && this.state.user.contact[0]["gender"].length > 0 && this.state.user.contact[0]["gender"] !== "Prefer Not to Answer"){
+        contactLineCount = 1
+        contact["gender"] = "" || <span>{this.state.user.contact[0]["gender"]}<br/></span>
+        if(this.state.user.contact[0]["gender"].length > 0 && this.state.user.contact[0]["location"].length > 0){
+          contact["gender"] = <span>{this.state.user.contact[0]["gender"]} / </span>
+        }
+      } else{
+        contact["gender"] = ""
+      }
+      if(this.state.user.contact[0]["location"] && this.state.user.contact[0]["location"].length > 0){
+        contactLineCount = 1
+        contact["location"] = "" || <span>{this.state.user.contact[0]["location"]}<br/></span>
+      } else{
+        contact["location"] = ""
+      }
+      if(this.state.user.contact[0]["other"] && this.state.user.contact[0]["other"].length > 0){
+        contactLineCount += 1
+        contact["other"] = "" || <div>{this.state.user.contact[0]["other"]}</div>
+      } else{
+        contact["other"] = ""
+      }
+      if(this.state.user.contact[0]["phoneNumber"] && this.state.user.contact[0]["phoneNumber"].length > 0){
+        contactLineCount += 1
+        contact["phoneNumber"] = "" || <div><a href={phoneLink}>{this.state.user.contact[0]["phoneNumber"]}</a></div>
+      } else{
+        contact["phoneNumber"] = ""
+      }
+      if(this.state.user.contact[0]["email"] && this.state.user.contact[0]["email"].length > 0){
+        contactLineCount += 1
+        contact["email"] = "" || <div><a href={mailLink}>{this.state.user.contact[0]["email"]}</a></div>
+      } else{
+        contact["email"] = ""
+      }
+      if(this.state.user.contact[0]["availability"] && this.state.user.contact[0]["availability"].length > 0){
+        contactLineCount += 1
+        contact["availability"] = "" || <div>Availability: {this.state.user.contact[0]["availability"]}</div>
+      } else{
+        contact["availability"] = ""
+      }
+    }
+    let extraLine = ""
+    if(contactLineCount === 5){
+      extraLine = <br className="d-none d-sm-block" />
+    }
     if((this.state.user.sports && this.state.user.sports.length > 0) || (this.state.bonusSports && this.state.bonusSports.length > 0)){
       // Get list of sports sorted
       let sports = this.sortedSportsList()
@@ -744,6 +839,7 @@ export default class Profile extends Component {
                   sportsPlayed.push(<span style={{fontSize: "3.2vh", color: "#435685"}} key="official"><br/><br/><b>Official Sports</b><br/><div style={{height: "1vh"}}></div></span>)
               }
                 officialIncluded = true
+                mySports = ""
                 officialSportsList.push(sport)
                 let eventTable = []
                 events[sport.id].reverse()
@@ -1933,6 +2029,7 @@ export default class Profile extends Component {
       unofficialCard =
 
         <Card className="mt-3 unofficial-card shadow" style={{width: '100%'}}>
+        <Card.Title style={{textAlign: "left"}} className="unofficial-title my-3 ml-5">{mySports}</Card.Title>
         <Card.Body>
     <Container className="mx-0 px-0 mx-sm-auto">
     <Row className="pb-3">
@@ -1989,7 +2086,7 @@ export default class Profile extends Component {
       officialCard =
         <Card className="mt-3 official-card shadow w-100" >
         <Card.Body>
-          <Card.Title style={{textAlign: "left"}} className="official-title ml-5">Ranked Sports</Card.Title>
+          <Card.Title style={{textAlign: "center"}} className="official-title">My Sports</Card.Title>
           <Container className="mx-0 px-0 mx-sm-auto">
             <Row>
             <Col className="pl-0 mx-0" xs="12">
@@ -2024,9 +2121,7 @@ export default class Profile extends Component {
             </Table>
             </Col>
             </Row>
-            <Row>
-              <a href="#add-sport">Add a New Sport</a>
-            </Row>
+
             </Container>
           </Card.Body>
         </Card>
@@ -2046,9 +2141,27 @@ export default class Profile extends Component {
           <Row style={{width: '100vw'}}>
           <Col xs="12" md="9" className="px-0 mx-md-auto">
           <Card className="ml-0" style={{width: "100%"}} className="shadow">
-            <Card.Title className="athlete-card-title pt-3 pl-5" style={{fontSize: '4vh'}}><b>{this.state.user.firstname} {this.state.user.lastname}'s <br className="d-block d-md-none"/>Athlete Profile</b><br/><span style={{fontSize: "3vh"}}>@{this.state.user.username}</span></Card.Title>
-            <Card.Body className="pl-5">
-              <span style={{marginBottom: "1%"}}>{athlete}</span>
+            <Col>
+            <Card.Title className="athlete-card-title pt-3 pl-5 mb-0 pb-0" style={{fontSize: '4vh'}}><b>{this.state.user.firstname} {this.state.user.lastname}'s <br className="d-block d-md-none"/>Athlete Profile</b><br/><span style={{fontSize: "3vh"}}>@{this.state.user.username}</span></Card.Title>
+            </Col>
+
+            <Card.Title className="pt-4 pr-3 mr-3 text-right float-right d-none d-sm-block"  style={{position: "absolute", right: "0%", zIndex: '1'}}>{contact["age"]} {contact["gender"]}
+            {contact["location"]}
+            {contact["phoneNumber"]}
+            {contact["email"]}
+            {contact["other"]}
+            {contact["availability"]}
+            <a href="#update-contact">Update Contact Info</a></Card.Title>
+            <Card.Body className="pl-5 pt-0 mt-0" style={{position: "relative"}}>
+              <span style={{marginBottom: "5%"}}>{athlete}</span>
+              <Card.Title className="pt-4 pr-3 mr-3 d-block d-sm-none">{contact["age"]} {contact["gender"]}
+              {contact["location"]}
+              {contact["phoneNumber"]}
+              {contact["email"]}
+              {contact["other"]}
+              {contact["availability"]}
+              <a href="#update-contact">Update Contact Info</a></Card.Title>
+              {extraLine}
             </Card.Body>
           </Card>
             </Col>
@@ -2073,7 +2186,7 @@ export default class Profile extends Component {
           <Col xs="12" md="9" className="px-0 mx-md-auto">
           <Card style={{width: '100%'}} className="mt-3 add-sport shadow">
             <Card.Body>
-              <Card.Title className="add-sport-title ml-md-5 mb-4">Pick a sport that you want to play and set your initial rating out of 10</Card.Title>
+              <Card.Title className="add-sport-title ml-md-5 mb-4">Pick a sport that you want to play and set your initial rating (how good are you on a scale of 1 to 10)</Card.Title>
               <Form onSubmit={this.handleSubmit}>
               <Row>
                 <Col xs="12" className="ml-md-5" lg="auto">
@@ -2082,6 +2195,7 @@ export default class Profile extends Component {
                     className="mb-2"
                     name="sport"
                     placeholder="  Sport Name"
+                    autoComplete="off"
                     onChange = {this.handleChange}
                     value={this.state.sport}
                     required
@@ -2119,11 +2233,18 @@ export default class Profile extends Component {
               >{sportList}</ListGroup>
               </Col>
               </Row>
+              <span  id="update-contact" />
+
               <Col className="my-3 ml-5">
               <h4 style={{color: "red"}}>{this.state.error}</h4>
               </Col>
             </Card.Body>
           </Card>
+          </Col>
+          </Row>
+          <Row style={{width: '100vw'}}>
+            <Col xs="12" md="9" className="px-0 mx-md-auto">
+          <ContactInfo history={this.props.history} updated={this.contactUpdated} lines={contactLineCount} updateContactClicked={this.updateContact}/>
           </Col>
           </Row>
           <Row style={{width: '100vw'}}>

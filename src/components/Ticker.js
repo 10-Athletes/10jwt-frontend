@@ -40,7 +40,7 @@ class TickerFooter extends Component {
 
    update(){
      let url = config.url.BASE_URL + 'events'
-     let url2 = config.url.BASE_URL + 'users'
+     let url2 = config.url.BASE_URL + 'usersloggedout'
      let url3 = config.url.BASE_URL + 'sports'
      Promise.all([fetch(url), fetch(url2), fetch(url3)])
      .then(function(responses) {
@@ -124,7 +124,7 @@ class TickerFooter extends Component {
        });
 
        this.setState({
-         events:     <Ticker speed="8" className="px-3 d-none d-md-block" style={{backgroundColor: "black"}}>
+         events:     <Ticker speed="7" className="px-3 d-none d-md-block" style={{backgroundColor: "black"}}>
              {({ index }) => (
                <>
                  <h4 className="px-5 my-0 d-none d-md-block" style={{marginRight: "-4px", backgroundColor: "black", color: "white"}}>{sportsTicker[index% sportsTicker.length]}</h4>

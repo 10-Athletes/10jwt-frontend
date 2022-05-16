@@ -32,9 +32,15 @@ export default class Profile extends Component {
 
   componentDidMount(){
     let userID = window.location.pathname.split("/")[2]
-    let url = config.url.BASE_URL + 'users' + "/" + userID
-    let url2 = config.url.BASE_URL + 'users'
-
+    let jwt = window.localStorage.getItem('jwt')
+    let url, url2
+    if(!jwt){
+      url = config.url.BASE_URL + 'userloggedout/' + userID
+      url2 = config.url.BASE_URL + 'usersloggedout'
+    } else {
+      url = config.url.BASE_URL + 'users' + "/" + userID
+      url2 = config.url.BASE_URL + 'users'
+    }
     Promise.all([fetch(url), fetch(url2)])
     .then(function(responses) {
       return Promise.all(responses.map(function(response) {
@@ -335,6 +341,24 @@ export default class Profile extends Component {
    this.setState({collapsed: arr})
  }
 
+ getAge(){
+   if(this.state.user.contact[0]["age"] !== ""){
+     var today = new Date()
+     var birthDate = this.state.user.contact[0]["age"]
+     var age = today.getFullYear() - birthDate["year"]
+     var m = today.getMonth() - birthDate["month"]
+     if(m < 0 || (m === 0 && today.getDate() < birthDate["day"])){
+       age--
+     }
+     if((this.state.user.contact[0]["gender"] && this.state.user.contact[0]["gender"] !== "Prefer Not to Answer") || this.state.user.contact[0]["location"]){
+       return <span>{age} /</span>
+     } else {
+       return <span>{age}<br/></span>
+     }
+   }
+   return ""
+ }
+
   render(){
     if (this.state.loading){
       return(
@@ -355,6 +379,7 @@ export default class Profile extends Component {
     let cards = []
     let sports = []
     let athlete = ""
+    let contact = {}
     let officialSports = []
     let unofficialSports = []
     let initialSports = []
@@ -362,6 +387,48 @@ export default class Profile extends Component {
     let unofficialCard = ""
     let initialCard = ""
     let recentCard = ""
+
+    if(this.state.user.contact && this.state.user.contact[0]){
+      let phoneLink = "sms:" + this.state.user.contact[0]["phoneNumber"]
+      let mailLink = "mailto:" + this.state.user.contact[0]["email"]
+      contact["age"] = this.getAge()
+      if(contact["age"].length > 0){
+      }
+      if(this.state.user.contact[0]["gender"].length > 0 && this.state.user.contact[0]["gender"] !== "Prefer Not to Answer"){
+        contact["gender"] = "" || <span>{this.state.user.contact[0]["gender"]}<br/></span>
+        if(this.state.user.contact[0]["gender"].length > 0 && this.state.user.contact[0]["location"].length > 0){
+          contact["gender"] = <span>{this.state.user.contact[0]["gender"]} / </span>
+        }
+      } else{
+        contact["gender"] = ""
+      }
+      if(this.state.user.contact[0]["location"].length > 0){
+        contact["location"] = "" || <span>{this.state.user.contact[0]["location"]}<br/></span>
+      } else{
+        contact["location"] = ""
+      }
+      if(this.state.user.contact[0]["other"].length > 0){
+        contact["other"] = "" || <div>{this.state.user.contact[0]["other"]}</div>
+      } else{
+        contact["other"] = ""
+      }
+      if(this.state.user.contact[0]["phoneNumber"].length > 0){
+        contact["phoneNumber"] = "" || <div><a href={phoneLink}>{this.state.user.contact[0]["phoneNumber"]}</a></div>
+      } else{
+        contact["phoneNumber"] = ""
+      }
+      if(this.state.user.contact[0]["email"].length > 0){
+        contact["email"] = "" || <div><a href={mailLink}>{this.state.user.contact[0]["email"]}</a></div>
+      } else{
+        contact["email"] = ""
+      }
+      if(this.state.user.contact[0]["availability"].length > 0){
+        contact["availability"] = "" || <div>Availability: {this.state.user.contact[0]["availability"]}</div>
+      } else{
+        contact["availability"] = ""
+      }
+    }
+
     if(this.state.user.sports){
       let sportsList = this.sortedSportsList()
       let officialLength = sportsList.pop()
@@ -453,7 +520,7 @@ export default class Profile extends Component {
           collapseChar = '▼'
         }
         if(i === 0 ){
-          athlete = <span className="athlete-statement"><span className="pr-2 athlete-statement-words" style={{color: "#225FBA"}}>Athlete Rating</span> {sport.rating.toFixed(2)}</span>
+          athlete = <span className="athlete-statement"><span className="pr-2 athlete-statement-words" style={{color: "#006D75"}}>Athlete Rating</span> {sport.rating.toFixed(2)}</span>
         } else if (i <= officialLength) {
           events[sport.id].reverse()
           let eventTable = []
@@ -680,9 +747,22 @@ export default class Profile extends Component {
                 <Row style={{width: '100vw'}}>
                 <Col xs="12" md="9" className="px-0 mx-md-auto">
                 <Card className="ml-0" style={{width: "100%"}} className="shadow">
-                  <Card.Title className="athlete-card-title pt-3 pl-5" style={{fontSize: '4vh'}}><b>{this.state.user.firstname} {this.state.user.lastname}'s <br className="d-block d-md-none"/>Athlete Profile</b><br/><span style={{fontSize: "3vh"}}>@{this.state.user.username}</span></Card.Title>
-                  <Card.Body className="pl-5">
-                    <span style={{marginBottom: "1%"}}>{athlete}</span>
+                  <Card.Title className="athlete-card-title pt-3 pl-5 mb-0 pb-0" style={{fontSize: '4vh'}}><b>{this.state.user.firstname} {this.state.user.lastname}'s <br className="d-block d-md-none"/>Athlete Profile</b><br/><span style={{fontSize: "3vh"}}>@{this.state.user.username}</span></Card.Title>
+                  <Card.Title className="pt-4 pr-3 mr-3 text-right float-right d-none d-sm-block"  style={{position: "absolute", right: "0%", zIndex: '1'}}>{contact["age"]} {contact["gender"]}
+                  {contact["location"]}
+                  {contact["phoneNumber"]}
+                  {contact["email"]}
+                  {contact["other"]}
+                  {contact["availability"]}</Card.Title>
+                  <Card.Body className="pl-5 pt-0 mt-0">
+                    <span style={{marginBottom: "5%"}}>{athlete}</span><br/>
+                    <Card.Title className="pt-4 pr-3 mr-3 d-block d-sm-none">{contact["age"]} {contact["gender"]}
+                    {contact["location"]}
+                    {contact["phoneNumber"]}
+                    {contact["email"]}
+                    {contact["other"]}
+                    {contact["availability"]}
+                    </Card.Title>
                   </Card.Body>
                 </Card>
                   </Col>

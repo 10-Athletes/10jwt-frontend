@@ -61,7 +61,8 @@ export default class NewEvent extends Component {
       }
     }
     let url1 = config.url.BASE_URL + 'sports'
-    let url2 = config.url.BASE_URL + 'users'
+    let url2 = config.url.BASE_URL + 'usersloggedout'
+
 
     Promise.all([fetch(url1), fetch(url2)])
     .then(function(responses) {
@@ -1376,6 +1377,7 @@ closeModal(){
             type="name"
             name="sport"
             placeholder="   Sport Name"
+            autoComplete="off"
             value={this.state.sport}
             onChange={this.handleChange}
             minLength='3'
@@ -1409,6 +1411,7 @@ closeModal(){
             placeholder="   Opponent Name(s)"
             value={this.state.opponent}
             onChange={this.handleChange}
+            autoComplete="off"
             minLength='3'
             size="lg"
           />
@@ -1433,6 +1436,7 @@ closeModal(){
             name="teammate"
             placeholder="   (Optional) Teammate Name(s)"
             value={this.state.teammate}
+            autoComplete="off"
             onChange={this.handleChange}
             minLength='3'
             size="lg"

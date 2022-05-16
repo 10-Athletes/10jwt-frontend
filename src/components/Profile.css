@@ -37,7 +37,7 @@
 .unofficial-title{
   text-align: left;
   color: #225FBA;
-  font-size: 3vh;
+  font-size: 3.2vh;
   font-weight: bold;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .table-striped tbody tr:nth-of-type(odd){
-  background-color: rgb(0,101,255,.07);
+  background-color: rgb(245,245,245);
 }
 
 .table-striped tbody tr:nth-of-type(odd):hover{
@@ -156,7 +156,7 @@
 
 .athlete-statement{
   font-size: 3.5vh;
-   color: #EA7200 !important;
+   color: #225FBA !important;
    font-weight: bolder;
 }
 

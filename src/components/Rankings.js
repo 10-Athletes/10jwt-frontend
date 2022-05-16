@@ -303,6 +303,7 @@ export default class Rankings extends Component {
                   name="sport"
                   type="text"
                   placeholder="   Sport Name"
+                  autoComplete="off"
                   value={this.state.sport}
                   onChange={this.handleChange}
                   onFocus={this.showSearchResults}
@@ -351,6 +352,7 @@ export default class Rankings extends Component {
                 name="sport"
                 type="text"
                 placeholder="   Sport Name"
+                autoComplete="off"
                 value={this.state.sport}
                 onChange={this.handleChange}
                 required />
@@ -408,6 +410,8 @@ export default class Rankings extends Component {
         </Col>
         </Row>
         </Container>
+        <br className="d-xs-block d-sm-none" />
+        <br className="d-xs-block d-sm-none" />
       </div>
     )
   }
