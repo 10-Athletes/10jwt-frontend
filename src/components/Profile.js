@@ -193,6 +193,8 @@ export default class Profile extends Component {
 
  findSports(sportName){
    let sportMatches = [];
+   let perfectMatches = [];
+   let absolutelyPerfectMatches = [];
    if(sportName.length >= 3){
      var list = this.state.sports;
      let user = this.state.user
@@ -200,16 +202,34 @@ export default class Profile extends Component {
        let addedSport = false;
        let mismatch;
        [...Array((sport.name.length - sportName.length + 1) > 0 ? (sport.name.length - sportName.length + 1) : 0)].forEach((_, i) => {
+         let notPerfect = false
 
           mismatch = 0;
          [...Array(sportName.length)].forEach((_,j) => {
            if(sportName[j].toUpperCase() !== sport.name[i+j].toUpperCase()){
              mismatch = mismatch + 1;
+             if(mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.name[i+j].toUpperCase() && sport.name[i+j+1] && sportName[j].toUpperCase() === sport.name[i+j+1].toUpperCase()){
+               mismatch = -1
+               notPerfect = true
+             } else if (mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.name[i+j].toUpperCase()) {
+               mismatch = 0
+               notPerfect = true
+             }
            }
          });
          if(mismatch < 2){
            var duplicate = false
            sportMatches.forEach(function(potentialSport){
+             if(sport.id === potentialSport.id){
+               duplicate = true
+             }
+           })
+           absolutelyPerfectMatches.forEach(function(potentialSport){
+             if(sport.id === potentialSport.id){
+               duplicate = true
+             }
+           })
+           perfectMatches.forEach(function(potentialSport){
              if(sport.id === potentialSport.id){
                duplicate = true
              }
@@ -222,26 +242,50 @@ export default class Profile extends Component {
                  alreadyRated = true
                }
              });
-             if(!alreadyRated)
-             sportMatches.push({name: sport.name,id: sport.id});
+             if(mismatch === 0 && !notPerfect && !alreadyRated){
+               if(i === 0){
+                 absolutelyPerfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+               } else{
+                 perfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+               }
+             } else if(!alreadyRated) {
+               sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p});
+             }
            }
          }
        });
        if(sport.alternate_name && !addedSport){
          [...Array((sport.alternate_name.length - sportName.length + 1) > 0 ? (sport.alternate_name.length - sportName.length + 1) : 0)].forEach((_, i) => {
 
-
+           let notPerfect = false
            mismatch = 0;
            [...Array(sportName.length)].forEach((_, j) => {
 
 
              if(sportName[j].toUpperCase() !== sport.alternate_name[i+j].toUpperCase()){
                mismatch = mismatch + 1;
+               if(mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.alternate_name[i+j].toUpperCase() && sport.alternate_name[i+j+1] && sportName[j].toUpperCase() === sport.alternate_name[i+j+1].toUpperCase()){
+                 mismatch = -1
+                 notPerfect = true
+               } else if (mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.alternate_name[i+j].toUpperCase()) {
+                 mismatch = 0
+                 notPerfect = true
+               }
              }
            });
            if(mismatch < 2){
               var duplicate = false
              sportMatches.forEach(function(potentialSport){
+               if(sport.id === potentialSport.id){
+                 duplicate = true
+               }
+             })
+             absolutelyPerfectMatches.forEach(function(potentialSport){
+               if(sport.id === potentialSport.id){
+                 duplicate = true
+               }
+             })
+             perfectMatches.forEach(function(potentialSport){
                if(sport.id === potentialSport.id){
                  duplicate = true
                }
@@ -253,8 +297,15 @@ export default class Profile extends Component {
                    alreadyRated = true
                  }
                });
-               if (!alreadyRated)
-               sportMatches.push({name: sport.name,id: sport.id});
+               if(mismatch === 0 && !notPerfect && !alreadyRated){
+                 if(i === 0){
+                   absolutelyPerfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+                 } else{
+                   perfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+                 }
+               } else if(!alreadyRated){
+                 sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p});
+               }
              }
            }
          });
@@ -262,8 +313,8 @@ export default class Profile extends Component {
 
      })
    }
-   return sportMatches;
- }
+   return [].concat(absolutelyPerfectMatches, perfectMatches,sportMatches);
+}
 
  fillSportName(event){
    console.log(event.target.attributes)

@@ -96,6 +96,8 @@ export default class Rankings extends Component {
 
   findSports(sportName){
     let sportMatches = [];
+    let absolutelyPerfectMatches = []
+    let perfectMatches = []
     let sportID = this.state.sportID
     if(sportName.length >= 3){
       var list = this.state.sports;
@@ -103,11 +105,18 @@ export default class Rankings extends Component {
         let addedSport = false;
         let mismatch;
         [...Array((sport.name.length - sportName.length + 1) > 0 ? (sport.name.length - sportName.length + 1) : 0)].forEach((_, i) => {
-
+          let notPerfect = false
            mismatch = 0;
           [...Array(sportName.length)].forEach((_,j) => {
             if(sportName[j].toUpperCase() !== sport.name[i+j].toUpperCase()){
               mismatch = mismatch + 1;
+              if(mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.name[i+j].toUpperCase() && sport.name[i+j+1] && sportName[j].toUpperCase() === sport.name[i+j+1].toUpperCase()){
+                mismatch = -1
+                notPerfect = true
+              } else if (mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.name[i+j].toUpperCase()) {
+                mismatch = 0
+                notPerfect = true
+              }
             }
           });
           if(mismatch < 2){
@@ -117,22 +126,47 @@ export default class Rankings extends Component {
                 duplicate = true
               }
             })
+            absolutelyPerfectMatches.forEach(function(potentialSport){
+              if(sport.id === potentialSport.id){
+                duplicate = true
+              }
+            })
+            perfectMatches.forEach(function(potentialSport){
+              if(sport.id === potentialSport.id){
+                duplicate = true
+              }
+            })
             if(!duplicate && sport.id !== sportID){
               addedSport = true
-              sportMatches.push({name: sport.name,id: sport.id});
+              if(mismatch === 0 && !notPerfect){
+                if(sport.name.length === sportName.length){
+                  absolutelyPerfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+                } else{
+                  perfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+                }
+              } else {
+                sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p});
+              }
             }
           }
         });
         if(sport.alternate_name && !addedSport){
           [...Array((sport.alternate_name.length - sportName.length + 1) > 0 ? (sport.alternate_name.length - sportName.length + 1) : 0)].forEach((_, i) => {
 
-
+            let notPerfect = false
             mismatch = 0;
             [...Array(sportName.length)].forEach((_, j) => {
 
 
               if(sportName[j].toUpperCase() !== sport.alternate_name[i+j].toUpperCase()){
                 mismatch = mismatch + 1;
+                if(mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.alternate_name[i+j].toUpperCase() && sport.alternate_name[i+j+1] && sportName[j].toUpperCase() === sport.alternate_name[i+j+1].toUpperCase()){
+                  mismatch = -1
+                  notPerfect = true
+                } else if (mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.alternate_name[i+j].toUpperCase()) {
+                  mismatch = 0
+                  notPerfect = true
+                }
               }
             });
             if(mismatch < 2){
@@ -142,8 +176,26 @@ export default class Rankings extends Component {
                   duplicate = true
                 }
               })
+              absolutelyPerfectMatches.forEach(function(potentialSport){
+                if(sport.id === potentialSport.id){
+                  duplicate = true
+                }
+              })
+              perfectMatches.forEach(function(potentialSport){
+                if(sport.id === potentialSport.id){
+                  duplicate = true
+                }
+              })
               if(!duplicate && sport.id !== sportID){
-                sportMatches.push({name: sport.name,id: sport.id});
+                if(mismatch === 0 && !notPerfect){
+                  if(i === 0){
+                    absolutelyPerfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+                  } else{
+                    perfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p})
+                  }
+                } else {
+                  sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p});
+                }
               }
             }
           });
@@ -151,8 +203,8 @@ export default class Rankings extends Component {
 
       })
     }
-    return sportMatches;
-  }
+    return [].concat(absolutelyPerfectMatches, perfectMatches,sportMatches);
+}
 
   fillSportName(event){
     event.preventDefault()

@@ -131,6 +131,8 @@ export default class NewEvent extends Component {
 
   findSports(sportName){
     let sportMatches = [];
+    let perfectMatches = [];
+    let absolutelyPerfectMatches = [];
     if(sportName.length >= 3){
       var list = this.state.sports;
       let user = this.state.user
@@ -138,20 +140,39 @@ export default class NewEvent extends Component {
         let addedSport = false;
         let mismatch;
         [...Array((sport.name.length - sportName.length + 1) > 0 ? (sport.name.length - sportName.length + 1) : 0)].forEach((_, i) => {
-        //   console.log(i)
+          // console.log(i, "test")
         // });
 
         // for(var i = 0; i < (sport.name.length - sportName.length + 1); i++){
+        let notPerfect = false
+
            mismatch = 0;
           [...Array(sportName.length)].forEach((_,j) => {
           // for(var j = 0; j < sportName.length; j++){
             if(sportName[j].toUpperCase() !== sport.name[i+j].toUpperCase()){
               mismatch = mismatch + 1;
+              if(mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.name[i+j].toUpperCase() && sport.name[i+j+1] && sportName[j].toUpperCase() === sport.name[i+j+1].toUpperCase()){
+                mismatch = -1
+                notPerfect = true
+              } else if (mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.name[i+j].toUpperCase()) {
+                mismatch = 0
+                notPerfect = true
+              }
             }
           });
           if(mismatch < 2){
             var duplicate = false
             sportMatches.forEach(function(potentialSport){
+              if(sport.id === potentialSport.id){
+                duplicate = true
+              }
+            })
+            absolutelyPerfectMatches.forEach(function(potentialSport){
+              if(sport.id === potentialSport.id){
+                duplicate = true
+              }
+            })
+            perfectMatches.forEach(function(potentialSport){
               if(sport.id === potentialSport.id){
                 duplicate = true
               }
@@ -165,7 +186,15 @@ export default class NewEvent extends Component {
                   rating = participant.rating
                 }
               });
-              sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p, rating});
+              if(mismatch === 0 && !notPerfect){
+                if(i === 0){
+                  absolutelyPerfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p, rating})
+                } else{
+                  perfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p, rating})
+                }
+              } else {
+                sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p, rating});
+              }
             }
           }
         });
@@ -175,6 +204,8 @@ export default class NewEvent extends Component {
           // });
 
           // for( var i = 0; i < (sport.alternate_name.length - sportName.length + 1); i++){
+            let notPerfect = false
+
             mismatch = 0;
             [...Array(sportName.length)].forEach((_, j) => {
 
@@ -182,11 +213,28 @@ export default class NewEvent extends Component {
             // for(var j = 0; j < sportName.length; j++){
               if(sportName[j].toUpperCase() !== sport.alternate_name[i+j].toUpperCase()){
                 mismatch = mismatch + 1;
+                if(mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.alternate_name[i+j].toUpperCase() && sport.name[i+j+1] && sportName[j].toUpperCase() === sport.alternate_name[i+j+1].toUpperCase()){
+                  mismatch = -1
+                  notPerfect = true
+                } else if (mismatch === 1 && sportName[j+1] && sportName[j+1].toUpperCase() === sport.alternate_name[i+j].toUpperCase()) {
+                  mismatch = 0
+                  notPerfect = true
+                }
               }
             });
             if(mismatch < 2){
                var duplicate = false
               sportMatches.forEach(function(potentialSport){
+                if(sport.id === potentialSport.id){
+                  duplicate = true
+                }
+              })
+              absolutelyPerfectMatches.forEach(function(potentialSport){
+                if(sport.id === potentialSport.id){
+                  duplicate = true
+                }
+              })
+              perfectMatches.forEach(function(potentialSport){
                 if(sport.id === potentialSport.id){
                   duplicate = true
                 }
@@ -198,7 +246,15 @@ export default class NewEvent extends Component {
                     rating = participant.rating
                   }
                 });
-                sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p, rating});
+                if(mismatch === 0 && !notPerfect){
+                  if(sport.name.length === sportName.length){
+                    absolutelyPerfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p, rating})
+                  } else{
+                    perfectMatches.push({name: sport.name, id: sport.id, participants: sport.participants, listpos: p, rating})
+                  }
+                } else {
+                  sportMatches.push({name: sport.name,id: sport.id, participants: sport.participants, listPos: p, rating});
+                }
               }
             }
           });
@@ -209,7 +265,7 @@ export default class NewEvent extends Component {
       })
     }
     // sportMatches.push(athleteRating)
-    return sportMatches;
+    return [].concat(absolutelyPerfectMatches, perfectMatches,sportMatches);
   }
 
   fillSportName(event){
@@ -256,23 +312,43 @@ export default class NewEvent extends Component {
     let opponents = this.state.opponents
     var userID = this.state.user.id
     var opponentMatches = [];
+    let perfectMatches = [];
+    let absolutelyPerfectMatches = [];
     if(opponentSearch.length >= 3){
       var list = this.state.users;
       list.forEach(function(opponent){
         let name = `${opponent.firstname} ${opponent.lastname}`
-        let mismatch = false
+        let notPerfect = false
+        let mismatch = 0
 
         Array.from(Array((name.length-opponentSearch.length + 1) > 0 ? name.length-opponentSearch.length + 1 : 0).keys()).forEach((i) => {
 
-          mismatch = false;
+          mismatch = 0;
             [...Array(opponentSearch.length)].forEach((_,j) => {
             if(opponentSearch[j].toUpperCase() !== name[i+j].toUpperCase()){
-              mismatch = true;
+              mismatch = mismatch + 1;
+              if(mismatch === 1 && opponentSearch[j+1] && opponentSearch[j+1].toUpperCase() === name[i+j].toUpperCase() && name[i+j+1] && opponentSearch[j].toUpperCase() === name[i+j+1].toUpperCase()){
+                mismatch = -1
+                notPerfect = true
+              } else if (mismatch === 1 && opponentSearch[j+1] && opponentSearch[j+1].toUpperCase() === name[i+j].toUpperCase()) {
+                mismatch = 0
+                notPerfect = true
+              }
             }
           });
-          if(!mismatch){
+          if(mismatch < 2){
             var duplicate = false;
             opponentMatches.forEach(function(potential){
+              if(potential.id === opponent.id){
+                duplicate = true;
+              }
+            })
+            absolutelyPerfectMatches.forEach(function(potential){
+              if(potential.id === opponent.id){
+                duplicate = true;
+              }
+            })
+            perfectMatches.forEach(function(potential){
               if(potential.id === opponent.id){
                 duplicate = true;
               }
@@ -297,23 +373,48 @@ export default class NewEvent extends Component {
                 });
 
               }
-              opponentMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating });
+              if(mismatch === 0 && !notPerfect){
+                if(i === 0){
+                  absolutelyPerfectMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating })
+                } else{
+                  perfectMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating })
+                }
+              } else{
+                opponentMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating });
+              }
             }
           }
         });
         Array.from(Array((opponent.username.length - opponentSearch.length + 1) > 0 ? opponent.username.length - opponentSearch.length + 1 : 0).keys()).forEach((_, i) => {
 
-
+          let notPerfect = false
         // for(i = 0; i < (opponent.username.length - opponentSearch.length + 1); i++){
-          mismatch = false;
+          mismatch = 0;
           for(var j = 0; j < opponentSearch.length; j++){
             if(opponentSearch[j].toUpperCase() !== opponent.username[i+j].toUpperCase()){
-              mismatch = true;
+              mismatch = mismatch + 1;
+              if(mismatch === 1 && opponentSearch[j+1] && opponentSearch[j+1].toUpperCase() === opponent.username[i+j].toUpperCase() && opponent.username[i+j+1] && opponentSearch[j].toUpperCase() === opponent.username[i+j+1].toUpperCase()){
+                mismatch = -1
+                notPerfect = true
+              } else if (mismatch === 1 && opponentSearch[j+1] && opponentSearch[j+1].toUpperCase() === opponent.username[i+j].toUpperCase()) {
+                mismatch = 0
+                notPerfect = true
+              }
             }
           }
-          if(!mismatch){
+          if(mismatch < 2){
             var duplicate = false;
             opponentMatches.forEach(function(potential){
+              if(potential.id === opponent.id){
+                duplicate = true;
+              }
+            })
+            absolutelyPerfectMatches.forEach(function(potential){
+              if(potential.id === opponent.id){
+                duplicate = true;
+              }
+            })
+            perfectMatches.forEach(function(potential){
               if(potential.id === opponent.id){
                 duplicate = true;
               }
@@ -338,14 +439,23 @@ export default class NewEvent extends Component {
                 });
 
               }
-              opponentMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating});
+              if(mismatch === 0 && !notPerfect){
+                if(i === 0){
+                  absolutelyPerfectMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating })
+                } else{
+                  perfectMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating })
+                }
+              } else{
+                opponentMatches.push({username: opponent.username, name: name, id: opponent.id, sports: opponent.sports, events: opponent.events, rating});
+              }
             }
           }
         });
       })
 
     }
-    return opponentMatches
+
+    return [].concat(absolutelyPerfectMatches, perfectMatches, opponentMatches)
   }
 
   fillOpponent(event){
