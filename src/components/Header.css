@@ -20,12 +20,23 @@
 }
 
 .ten-logo{
-  color: #EA7200;
+  color: #005EBD;
   font-size: 110%;
 }
 
 .ten-logo-athletes{
   color: #006D75;
+  font-size: 110%;
+}
+
+.ten-logo-main{
+  color: #005EBD;
+  font-size: 110%;
+}
+
+.ten-logo-athletes-main{
+  color: #006D75;
+  font-size: 110%;
 }
 
 .nav-link{

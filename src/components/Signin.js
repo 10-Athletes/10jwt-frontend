@@ -192,7 +192,7 @@ class Signin extends Component {
           <Col xl="6">
 
       <div className="d-none d-xl-block text-center" style={{height: '20vh', fontFamily: "boogaloo", fontSize: '15vh'}}>
-      <span className="ten-logo"><span style={{letterSpacing: "-10px"}}>1</span>0</span><span className="ten-logo-athletes">Athletes</span>
+      <span className="ten-logo-main"><span style={{letterSpacing: "-10px"}}>1</span>0</span><span className="ten-logo-athletes-main">Athletes</span>
       </div>
       <div className="d-none d-xl-block text-center"><span className="descriptive-tagline-big" style={{height: '7vh', fontSize: '5vh', fontFamily: "boogaloo"}}>Play Sports, Get Ranked</span></div>
       <div className="d-block d-xl-none text-center pt-5 m-5" style={{height: '4vh', fontFamily: "boogaloo", fontSize: '4vh'}}>
